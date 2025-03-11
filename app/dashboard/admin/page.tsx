@@ -72,7 +72,7 @@ export default function AdminDashboard() {
       provider: "CleanCo Laundry",
       service: "Standard Wash",
       date: "Mar 23, 2023",
-      amount: "$24.99",
+      amount: "24.99",
       status: "Completed",
     },
     {
@@ -81,7 +81,7 @@ export default function AdminDashboard() {
       provider: "Fresh Fold Services",
       service: "Dry Cleaning",
       date: "Mar 22, 2023",
-      amount: "$34.99",
+      amount: "34.99",
       status: "In Progress",
     },
     {
@@ -90,7 +90,7 @@ export default function AdminDashboard() {
       provider: "Sparkle Wash",
       service: "Premium Wash",
       date: "Mar 22, 2023",
-      amount: "$29.99",
+      amount: "29.99",
       status: "Scheduled",
     },
     {
@@ -99,7 +99,7 @@ export default function AdminDashboard() {
       provider: "Laundry Express",
       service: "Ironing",
       date: "Mar 21, 2023",
-      amount: "$19.99",
+      amount: "19.99",
       status: "Completed",
     },
     {
@@ -108,7 +108,7 @@ export default function AdminDashboard() {
       provider: "CleanCo Laundry",
       service: "Standard Wash",
       date: "Mar 21, 2023",
-      amount: "$24.99",
+      amount: "24.99",
       status: "Completed",
     },
   ]
@@ -185,7 +185,7 @@ export default function AdminDashboard() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$24,325.50</div>
+            <div className="text-2xl font-bold">24,325.50</div>
             <div className="flex items-center pt-1 text-xs text-green-500">
               <TrendingUp className="mr-1 h-3 w-3" />
               <span>+12% from last month</span>
@@ -393,11 +393,11 @@ export default function AdminDashboard() {
             <div className="w-full text-sm">
               <div className="mb-2 flex items-center justify-between">
                 <span>Current month:</span>
-                <span className="font-medium">$24,325.50</span>
+                <span className="font-medium">24,325.50</span>
               </div>
               <div className="mb-2 flex items-center justify-between">
                 <span>Previous month:</span>
-                <span className="font-medium">$21,720.25</span>
+                <span className="font-medium">21,720.25</span>
               </div>
               <div className="flex items-center justify-between text-green-500">
                 <span>Growth rate:</span>
