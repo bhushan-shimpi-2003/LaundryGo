@@ -19,7 +19,7 @@ const orderData = {
   status: "In Progress",
   service: "Standard Wash",
   weight: "5 kg",
-  amount: "$24.99",
+  amount: "₹999",
   paymentMethod: "Visa ending in 4242",
   specialInstructions: "Please handle with care. There are some delicate items.",
   timeline: [
@@ -58,21 +58,21 @@ const orderData = {
   ],
   provider: {
     name: "CleanCo Laundry",
-    address: "789 Laundry St, New York, NY 10003",
-    phone: "+1 (555) 987-6543",
+    address: "789 Laundry St, Mumbai, MH 400001",
+    phone: "+91 98765 43210",
     rating: 4.8,
   },
   items: [
-    { name: "T-shirts", quantity: 3, price: "$9.00" },
-    { name: "Pants", quantity: 2, price: "$8.00" },
-    { name: "Shirts", quantity: 2, price: "$6.00" },
-    { name: "Socks (pairs)", quantity: 4, price: "$2.00" },
+    { name: "T-shirts", quantity: 3, price: "₹300" },
+    { name: "Pants", quantity: 2, price: "₹400" },
+    { name: "Shirts", quantity: 2, price: "₹200" },
+    { name: "Socks (pairs)", quantity: 4, price: "₹100" },
   ],
   address: {
     type: "Home",
     street: "123 Main St, Apt 4B",
-    city: "New York, NY 10001",
-    phone: "+1 (555) 123-4567",
+    city: "Mumbai, MH 400001",
+    phone: "+91 98765 12345",
   },
 }
 

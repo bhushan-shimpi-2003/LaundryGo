@@ -73,7 +73,7 @@ export default function CustomerOrders() {
                 <TableCell className="font-medium">#1234</TableCell>
                 <TableCell>Mar 14, 2023</TableCell>
                 <TableCell>Standard Wash</TableCell>
-                <TableCell>$24.99</TableCell>
+                <TableCell>₹999</TableCell>
                 <TableCell>
                   <span className="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">
                     In Progress
@@ -103,7 +103,7 @@ export default function CustomerOrders() {
                 <TableCell className="font-medium">#1233</TableCell>
                 <TableCell>Mar 10, 2023</TableCell>
                 <TableCell>Dry Cleaning</TableCell>
-                <TableCell>$34.99</TableCell>
+                <TableCell>₹1,499</TableCell>
                 <TableCell>
                   <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
                     Delivered
@@ -133,7 +133,7 @@ export default function CustomerOrders() {
                 <TableCell className="font-medium">#1232</TableCell>
                 <TableCell>Mar 5, 2023</TableCell>
                 <TableCell>Standard Wash</TableCell>
-                <TableCell>$19.99</TableCell>
+                <TableCell>₹799</TableCell>
                 <TableCell>
                   <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
                     Delivered
@@ -163,7 +163,7 @@ export default function CustomerOrders() {
                 <TableCell className="font-medium">#1231</TableCell>
                 <TableCell>Feb 28, 2023</TableCell>
                 <TableCell>Premium Wash</TableCell>
-                <TableCell>$29.99</TableCell>
+                <TableCell>₹1,299</TableCell>
                 <TableCell>
                   <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
                     Delivered
@@ -193,7 +193,7 @@ export default function CustomerOrders() {
                 <TableCell className="font-medium">#1230</TableCell>
                 <TableCell>Feb 22, 2023</TableCell>
                 <TableCell>Ironing</TableCell>
-                <TableCell>$15.99</TableCell>
+                <TableCell>₹599</TableCell>
                 <TableCell>
                   <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
                     Delivered

@@ -13,9 +13,14 @@ export default function CustomerDashboard() {
           <h2 className="text-2xl font-bold tracking-tight">Welcome back, John!</h2>
           <p className="text-muted-foreground">Here&apos;s an overview of your laundry services.</p>
         </div>
-        <Link href="/dashboard/customer/orders/new">
-          <Button>Schedule Pickup</Button>
-        </Link>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Link href="/dashboard/customer/orders/new">
+            <Button>Schedule Pickup</Button>
+          </Link>
+          <Link href="/dashboard/customer/addresses/new">
+            <Button variant="outline">Add New Address</Button>
+          </Link>
+        </div>
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
@@ -73,8 +78,17 @@ export default function CustomerDashboard() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <Card className="lg:col-span-4">
           <CardHeader>
-            <CardTitle>Recent Orders</CardTitle>
-            <CardDescription>Your recent laundry service orders</CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Recent Orders</CardTitle>
+                <CardDescription>Your recent laundry service orders</CardDescription>
+              </div>
+              <Link href="/dashboard/customer/orders">
+                <Button variant="outline" size="sm">
+                  View All Orders
+                </Button>
+              </Link>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -88,13 +102,15 @@ export default function CustomerDashboard() {
                   <p className="text-sm text-muted-foreground">5 kg</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-sm font-medium">$24.99</p>
+                  <p className="text-sm font-medium">₹999</p>
                   <p className="text-sm text-muted-foreground">Paid</p>
                 </div>
-                <div className="flex items-center">
-                  <span className="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">
-                    In Progress
-                  </span>
+                <div className="flex items-center justify-end">
+                  <Link href="/dashboard/customer/orders/1234">
+                    <Button variant="outline" size="sm">
+                      Track Order
+                    </Button>
+                  </Link>
                 </div>
               </div>
               <div className="grid grid-cols-4 gap-4 rounded-lg border p-4">
@@ -107,13 +123,15 @@ export default function CustomerDashboard() {
                   <p className="text-sm text-muted-foreground">3 items</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-sm font-medium">$34.99</p>
+                  <p className="text-sm font-medium">₹1,499</p>
                   <p className="text-sm text-muted-foreground">Paid</p>
                 </div>
-                <div className="flex items-center">
-                  <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
-                    Delivered
-                  </span>
+                <div className="flex items-center justify-end">
+                  <Link href="/dashboard/customer/orders/1233">
+                    <Button variant="outline" size="sm">
+                      View Details
+                    </Button>
+                  </Link>
                 </div>
               </div>
               <div className="grid grid-cols-4 gap-4 rounded-lg border p-4">
@@ -126,13 +144,15 @@ export default function CustomerDashboard() {
                   <p className="text-sm text-muted-foreground">4 kg</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-sm font-medium">$19.99</p>
+                  <p className="text-sm font-medium">₹799</p>
                   <p className="text-sm text-muted-foreground">Paid</p>
                 </div>
-                <div className="flex items-center">
-                  <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
-                    Delivered
-                  </span>
+                <div className="flex items-center justify-end">
+                  <Link href="/dashboard/customer/orders/1232">
+                    <Button variant="outline" size="sm">
+                      View Details
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </div>
