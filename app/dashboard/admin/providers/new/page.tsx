@@ -25,7 +25,7 @@ const providerFormSchema = z.object({
   address: z.string().min(5, { message: "Address must be at least 5 characters." }),
   city: z.string().min(2, { message: "City must be at least 2 characters." }),
   state: z.string().min(2, { message: "State must be at least 2 characters." }),
-  zipCode: z.string().min(5, { message: "Zip code must be at least 5 characters." }),
+  pinCode: z.string().min(6, { message: "PIN code must be at least 6 characters." }),
   country: z.string().min(2, { message: "Country must be at least 2 characters." }),
   description: z.string().optional(),
   serviceArea: z.string().min(2, { message: "Service area must be at least 2 characters." }),
@@ -33,6 +33,8 @@ const providerFormSchema = z.object({
   commissionRate: z.string().min(1, { message: "Commission rate is required." }),
   status: z.string(),
   featured: z.boolean().default(false),
+  gstNumber: z.string().optional(),
+  panNumber: z.string().optional(),
 })
 
 export default function NewProviderPage() {
@@ -50,14 +52,16 @@ export default function NewProviderPage() {
       address: "",
       city: "",
       state: "",
-      zipCode: "",
-      country: "United States",
+      pinCode: "",
+      country: "India",
       description: "",
       serviceArea: "",
       serviceTypes: "",
       commissionRate: "10",
       status: "Pending",
       featured: false,
+      gstNumber: "",
+      panNumber: "",
     },
   })
 
@@ -94,8 +98,8 @@ export default function NewProviderPage() {
         </div>
       </div>
 
-      <Card>
-        <CardHeader>
+      <Card className="border-green-200">
+        <CardHeader className="bg-green-50 rounded-t-lg">
           <CardTitle>Provider Information</CardTitle>
           <CardDescription>Enter the details of the new service provider</CardDescription>
         </CardHeader>
@@ -104,7 +108,7 @@ export default function NewProviderPage() {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <div className="space-y-6">
                 <div className="space-y-4">
-                  <h3 className="text-lg font-medium">Basic Information</h3>
+                  <h3 className="text-lg font-medium text-orange-700">Basic Information</h3>
                   <div className="grid gap-4 md:grid-cols-2">
                     <FormField
                       control={form.control}
@@ -176,7 +180,7 @@ export default function NewProviderPage() {
                 </div>
 
                 <div className="space-y-4">
-                  <h3 className="text-lg font-medium">Location Information</h3>
+                  <h3 className="text-lg font-medium text-blue-700">Location Information</h3>
                   <div className="grid gap-4 md:grid-cols-2">
                     <FormField
                       control={form.control}
@@ -212,9 +216,26 @@ export default function NewProviderPage() {
                       name="state"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>State/Province</FormLabel>
+                          <FormLabel>State</FormLabel>
                           <FormControl>
-                            <Input placeholder="Enter state or province" {...field} />
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select state" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="Andhra Pradesh">Andhra Pradesh</SelectItem>
+                                <SelectItem value="Delhi">Delhi</SelectItem>
+                                <SelectItem value="Gujarat">Gujarat</SelectItem>
+                                <SelectItem value="Karnataka">Karnataka</SelectItem>
+                                <SelectItem value="Maharashtra">Maharashtra</SelectItem>
+                                <SelectItem value="Tamil Nadu">Tamil Nadu</SelectItem>
+                                <SelectItem value="Telangana">Telangana</SelectItem>
+                                <SelectItem value="Uttar Pradesh">Uttar Pradesh</SelectItem>
+                                <SelectItem value="West Bengal">West Bengal</SelectItem>
+                              </SelectContent>
+                            </Select>
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -222,12 +243,12 @@ export default function NewProviderPage() {
                     />
                     <FormField
                       control={form.control}
-                      name="zipCode"
+                      name="pinCode"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Zip/Postal Code</FormLabel>
+                          <FormLabel>PIN Code</FormLabel>
                           <FormControl>
-                            <Input placeholder="Enter zip or postal code" {...field} />
+                            <Input placeholder="Enter PIN code" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -253,7 +274,7 @@ export default function NewProviderPage() {
                         <FormItem>
                           <FormLabel>Service Area</FormLabel>
                           <FormControl>
-                            <Input placeholder="e.g., 5 miles radius, Manhattan area" {...field} />
+                            <Input placeholder="e.g., 5 km radius, South Mumbai area" {...field} />
                           </FormControl>
                           <FormDescription>The area where this provider offers services</FormDescription>
                           <FormMessage />
@@ -264,7 +285,7 @@ export default function NewProviderPage() {
                 </div>
 
                 <div className="space-y-4">
-                  <h3 className="text-lg font-medium">Service Information</h3>
+                  <h3 className="text-lg font-medium text-orange-700">Service Information</h3>
                   <div className="grid gap-4 md:grid-cols-2">
                     <FormField
                       control={form.control}
@@ -336,13 +357,47 @@ export default function NewProviderPage() {
                     />
                   </div>
                 </div>
+
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium text-blue-700">Tax Information</h3>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <FormField
+                      control={form.control}
+                      name="gstNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>GST Number</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter GST number" {...field} />
+                          </FormControl>
+                          <FormDescription>Provider's GST registration number</FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="panNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>PAN Number</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter PAN number" {...field} />
+                          </FormControl>
+                          <FormDescription>Provider's PAN card number</FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
               </div>
 
               <CardFooter className="flex justify-between px-0">
                 <Button variant="outline" type="button" onClick={() => router.push("/dashboard/admin/providers")}>
                   Cancel
                 </Button>
-                <Button type="submit" disabled={isSubmitting}>
+                <Button type="submit" disabled={isSubmitting} className="bg-green-600 hover:bg-green-700">
                   {isSubmitting ? (
                     <>Processing...</>
                   ) : (

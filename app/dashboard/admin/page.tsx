@@ -30,35 +30,35 @@ export default function AdminDashboard() {
     {
       id: "SP001",
       name: "CleanCo Laundry",
-      location: "New York, NY",
+      location: "Mumbai, MH",
       status: "Active",
       joinDate: "Mar 15, 2023",
     },
     {
       id: "SP002",
       name: "Fresh Fold Services",
-      location: "Los Angeles, CA",
+      location: "Delhi, DL",
       status: "Active",
       joinDate: "Mar 14, 2023",
     },
     {
       id: "SP003",
       name: "Sparkle Wash",
-      location: "Chicago, IL",
+      location: "Bangalore, KA",
       status: "Pending",
       joinDate: "Mar 13, 2023",
     },
     {
       id: "SP004",
       name: "Laundry Express",
-      location: "Miami, FL",
+      location: "Chennai, TN",
       status: "Active",
       joinDate: "Mar 12, 2023",
     },
     {
       id: "SP005",
       name: "Wash & Fold Co.",
-      location: "Seattle, WA",
+      location: "Hyderabad, TS",
       status: "Suspended",
       joinDate: "Mar 10, 2023",
     },
@@ -68,47 +68,47 @@ export default function AdminDashboard() {
   const recentOrders = [
     {
       id: "ORD-1234",
-      customer: "Sarah Johnson",
+      customer: "Rahul Sharma",
       provider: "CleanCo Laundry",
       service: "Standard Wash",
       date: "Mar 23, 2023",
-      amount: "24.99",
+      amount: "₹999",
       status: "Completed",
     },
     {
       id: "ORD-1235",
-      customer: "Michael Brown",
+      customer: "Priya Patel",
       provider: "Fresh Fold Services",
       service: "Dry Cleaning",
       date: "Mar 22, 2023",
-      amount: "34.99",
+      amount: "₹1,499",
       status: "In Progress",
     },
     {
       id: "ORD-1236",
-      customer: "Emily Davis",
+      customer: "Amit Kumar",
       provider: "Sparkle Wash",
       service: "Premium Wash",
       date: "Mar 22, 2023",
-      amount: "29.99",
+      amount: "₹1,299",
       status: "Scheduled",
     },
     {
       id: "ORD-1237",
-      customer: "David Wilson",
+      customer: "Neha Singh",
       provider: "Laundry Express",
       service: "Ironing",
       date: "Mar 21, 2023",
-      amount: "19.99",
+      amount: "₹799",
       status: "Completed",
     },
     {
       id: "ORD-1238",
-      customer: "Jessica Martinez",
+      customer: "Vikram Mehta",
       provider: "CleanCo Laundry",
       service: "Standard Wash",
       date: "Mar 21, 2023",
-      amount: "24.99",
+      amount: "₹999",
       status: "Completed",
     },
   ]
@@ -132,7 +132,7 @@ export default function AdminDashboard() {
               <SelectItem value="year">Last 12 months</SelectItem>
             </SelectContent>
           </Select>
-          <Button onClick={() => router.push("/dashboard/admin/reports")}>
+          <Button onClick={() => router.push("/dashboard/admin/reports")} className="bg-orange-600 hover:bg-orange-700">
             <LineChart className="mr-2 h-4 w-4" />
             View Reports
           </Button>
@@ -140,7 +140,7 @@ export default function AdminDashboard() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="cursor-pointer" onClick={() => router.push("/dashboard/admin/customers")}>
+        <Card className="cursor-pointer border-orange-200" onClick={() => router.push("/dashboard/admin/customers")}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Customers</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
@@ -153,7 +153,7 @@ export default function AdminDashboard() {
             </div>
           </CardContent>
         </Card>
-        <Card className="cursor-pointer" onClick={() => router.push("/dashboard/admin/providers")}>
+        <Card className="cursor-pointer border-green-200" onClick={() => router.push("/dashboard/admin/providers")}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Service Providers</CardTitle>
             <Package className="h-4 w-4 text-muted-foreground" />
@@ -166,7 +166,7 @@ export default function AdminDashboard() {
             </div>
           </CardContent>
         </Card>
-        <Card className="cursor-pointer" onClick={() => router.push("/dashboard/admin/orders")}>
+        <Card className="cursor-pointer border-blue-200" onClick={() => router.push("/dashboard/admin/orders")}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
             <ShoppingCart className="h-4 w-4 text-muted-foreground" />
@@ -179,13 +179,13 @@ export default function AdminDashboard() {
             </div>
           </CardContent>
         </Card>
-        <Card className="cursor-pointer" onClick={() => router.push("/dashboard/admin/analytics")}>
+        <Card className="cursor-pointer border-orange-200" onClick={() => router.push("/dashboard/admin/analytics")}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Platform Revenue</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">24,325.50</div>
+            <div className="text-2xl font-bold">₹24,32,550</div>
             <div className="flex items-center pt-1 text-xs text-green-500">
               <TrendingUp className="mr-1 h-3 w-3" />
               <span>+12% from last month</span>
@@ -195,13 +195,17 @@ export default function AdminDashboard() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="lg:col-span-4">
+        <Card className="lg:col-span-4 border-green-200">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
               <CardTitle>Service Providers</CardTitle>
               <CardDescription>Manage laundry service providers on the platform</CardDescription>
             </div>
-            <Button size="sm" onClick={() => router.push("/dashboard/admin/providers/new")}>
+            <Button
+              size="sm"
+              onClick={() => router.push("/dashboard/admin/providers/new")}
+              className="bg-green-600 hover:bg-green-700"
+            >
               <Package className="mr-2 h-4 w-4" />
               Add Provider
             </Button>
@@ -256,7 +260,7 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-3">
+        <Card className="lg:col-span-3 border-blue-200">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
@@ -314,15 +318,15 @@ export default function AdminDashboard() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <Card className="col-span-1 lg:col-span-1">
+        <Card className="col-span-1 lg:col-span-1 border-orange-200">
           <CardHeader>
             <CardTitle>Service Distribution</CardTitle>
             <CardDescription>Orders by service type</CardDescription>
           </CardHeader>
           <CardContent className="flex h-[300px] items-center justify-center">
-            <div className="flex h-40 w-40 items-center justify-center rounded-full border-8 border-primary/20">
+            <div className="flex h-40 w-40 items-center justify-center rounded-full border-8 border-orange-500/20">
               <div className="flex flex-col items-center">
-                <PieChart className="h-10 w-10 text-primary" />
+                <PieChart className="h-10 w-10 text-orange-500" />
                 <p className="mt-2 text-sm text-muted-foreground">Service breakdown</p>
               </div>
             </div>
@@ -330,7 +334,7 @@ export default function AdminDashboard() {
           <CardFooter>
             <div className="grid w-full grid-cols-2 gap-2 text-sm">
               <div className="flex items-center">
-                <div className="mr-2 h-3 w-3 rounded-full bg-primary"></div>
+                <div className="mr-2 h-3 w-3 rounded-full bg-orange-500"></div>
                 <span>Standard Wash (45%)</span>
               </div>
               <div className="flex items-center">
@@ -349,14 +353,14 @@ export default function AdminDashboard() {
           </CardFooter>
         </Card>
 
-        <Card className="col-span-1 lg:col-span-1">
+        <Card className="col-span-1 lg:col-span-1 border-green-200">
           <CardHeader>
             <CardTitle>Customer Growth</CardTitle>
             <CardDescription>New customer signups over time</CardDescription>
           </CardHeader>
           <CardContent className="flex h-[300px] items-center justify-center">
             <div className="flex flex-col items-center">
-              <BarChart className="h-10 w-10 text-primary" />
+              <BarChart className="h-10 w-10 text-green-500" />
               <p className="mt-2 text-sm text-muted-foreground">Monthly growth trend</p>
             </div>
           </CardContent>
@@ -378,14 +382,14 @@ export default function AdminDashboard() {
           </CardFooter>
         </Card>
 
-        <Card className="col-span-1 lg:col-span-1">
+        <Card className="col-span-1 lg:col-span-1 border-blue-200">
           <CardHeader>
             <CardTitle>Revenue Trends</CardTitle>
             <CardDescription>Platform revenue over time</CardDescription>
           </CardHeader>
           <CardContent className="flex h-[300px] items-center justify-center">
             <div className="flex flex-col items-center">
-              <LineChart className="h-10 w-10 text-primary" />
+              <LineChart className="h-10 w-10 text-blue-500" />
               <p className="mt-2 text-sm text-muted-foreground">Monthly revenue trend</p>
             </div>
           </CardContent>
@@ -393,11 +397,11 @@ export default function AdminDashboard() {
             <div className="w-full text-sm">
               <div className="mb-2 flex items-center justify-between">
                 <span>Current month:</span>
-                <span className="font-medium">24,325.50</span>
+                <span className="font-medium">₹24,32,550</span>
               </div>
               <div className="mb-2 flex items-center justify-between">
                 <span>Previous month:</span>
-                <span className="font-medium">21,720.25</span>
+                <span className="font-medium">₹21,72,025</span>
               </div>
               <div className="flex items-center justify-between text-green-500">
                 <span>Growth rate:</span>
