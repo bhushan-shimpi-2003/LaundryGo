@@ -3,7 +3,7 @@
 import { useState, useRef } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Calendar, Clock, Download, MapPin, Phone, Printer, Shirt, Truck } from "lucide-react"
+import { ArrowLeft, Calendar, Clock, Download, MapPin, Phone, Printer, Shirt, Truck, FileText } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 
 import { Button } from "@/components/ui/button"
@@ -137,6 +137,12 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
             <Download className="mr-2 h-4 w-4" />
             Download
           </Button>
+          <Link href={`/dashboard/customer/orders/${params.id}/invoice`}>
+            <Button variant="outline" size="sm">
+              <FileText className="mr-2 h-4 w-4" />
+              Invoice
+            </Button>
+          </Link>
           <Button size="sm" onClick={handleContactSupport}>
             Contact Support
           </Button>

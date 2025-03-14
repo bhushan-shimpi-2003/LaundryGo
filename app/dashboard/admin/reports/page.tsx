@@ -4,8 +4,8 @@ import { useState } from "react"
 import { CalendarIcon, Download, FileText } from "lucide-react"
 import { format } from "date-fns"
 // Remove jsPDF import if causing errors and replace with a simpler implementation
-// import { jsPDF } from "jspdf"
-// import autoTable from "jspdf-autotable"
+import { jsPDF } from "jspdf"
+import autoTable from "jspdf-autotable"
 
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
@@ -152,6 +152,8 @@ export default function AdminReportsPage() {
   // Get unique providers for filter
   const providers = [...new Set(mockOrders.map((order) => order.provider))]
 
+  // Replace the simplified generatePDF function with a more complete implementation
+
   const generatePDF = () => {
     if (!startDate || !endDate) {
       toast({
@@ -162,211 +164,215 @@ export default function AdminReportsPage() {
       return
     }
 
-    // Simple implementation without jsPDF if it's causing errors
-    toast({
-      title: "Report generated",
-      description: "Your report has been generated and downloaded successfully.",
-    })
+    try {
+      // Create a new PDF document
+      const doc = new jsPDF()
 
-    // Simulate download
-    setTimeout(() => {
-      const fileName = `admin-report-${format(new Date(), "yyyy-MM-dd")}.pdf`
-      const link = document.createElement("a")
-      link.href = "#"
-      link.download = fileName
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-    }, 1000)
+      // Add company logo/header
+      doc.setFontSize(20)
+      doc.setTextColor(255, 153, 51) // Saffron color
+      doc.text("LaundryConnect", 105, 20, { align: "center" })
+
+      // Add report title
+      doc.setFontSize(16)
+      doc.setTextColor(0, 0, 0)
+      doc.text("ADMIN REPORT", 105, 30, { align: "center" })
+
+      // Add date range and report type
+      doc.setFontSize(10)
+      doc.text(
+        `Report Period: ${startDate ? format(startDate, "MMM dd, yyyy") : ""} - ${endDate ? format(endDate, "MMM dd, yyyy") : ""}`,
+        105,
+        40,
+        { align: "center" },
+      )
+      doc.text(`Report Type: ${reportType.charAt(0).toUpperCase() + reportType.slice(1)}`, 105, 45, { align: "center" })
+      doc.text(`Generated on: ${format(new Date(), "MMM dd, yyyy")}`, 105, 50, { align: "center" })
+
+      if (reportType === "platform") {
+        // Add platform overview
+        doc.setFontSize(14)
+        doc.text("Platform Overview", 20, 60)
+
+        // Add daily revenue table
+        const tableColumn = ["Date", "Orders", "Revenue", "Platform Commission"]
+        const tableRows = mockDailyRevenue
+          .slice(0, 5)
+          .map((item) => [
+            item.date,
+            item.orders.toString(),
+            `₹${item.revenue.toFixed(2)}`,
+            `₹${item.commission.toFixed(2)}`,
+          ])
+
+        // Add revenue table
+        autoTable(doc, {
+          head: [tableColumn],
+          body: tableRows,
+          startY: 65,
+          theme: "grid",
+          styles: { fontSize: 10 },
+          headStyles: { fillColor: [19, 136, 8] }, // Green color
+        })
+
+        // Add provider revenue table
+        const finalY1 = (doc as any).lastAutoTable.finalY + 15
+
+        doc.setFontSize(14)
+        doc.text("Revenue by Provider", 20, finalY1)
+
+        const providerTableColumn = ["Provider", "Orders", "Revenue", "Platform Commission"]
+        const providerTableRows = mockRevenueByProvider.map((item) => [
+          item.provider,
+          item.orders.toString(),
+          `₹${item.revenue.toFixed(2)}`,
+          `₹${item.commission.toFixed(2)}`,
+        ])
+
+        // Add provider table
+        autoTable(doc, {
+          head: [providerTableColumn],
+          body: providerTableRows,
+          startY: finalY1 + 5,
+          theme: "grid",
+          styles: { fontSize: 10 },
+          headStyles: { fillColor: [19, 136, 8] }, // Green color
+        })
+
+        // Add summary
+        const finalY2 = (doc as any).lastAutoTable.finalY + 10
+        const totalRevenue = mockRevenueByProvider.reduce((sum, item) => sum + item.revenue, 0)
+        const totalCommission = mockRevenueByProvider.reduce((sum, item) => sum + item.commission, 0)
+        const totalOrders = mockRevenueByProvider.reduce((sum, item) => sum + item.orders, 0)
+
+        doc.setFontSize(12)
+        doc.text(`Total Providers: ${mockRevenueByProvider.length}`, 20, finalY2)
+        doc.text(`Total Orders: ${totalOrders}`, 20, finalY2 + 6)
+        doc.text(`Total Revenue: ₹${totalRevenue.toFixed(2)}`, 20, finalY2 + 12)
+        doc.text(`Total Commission: ₹${totalCommission.toFixed(2)}`, 20, finalY2 + 18)
+      } else if (reportType === "provider") {
+        // Add provider overview
+        doc.setFontSize(14)
+        doc.text("Provider Performance", 20, 60)
+
+        // Filter by provider if selected
+        const filteredProviderRevenue =
+          providerFilter === "all"
+            ? mockRevenueByProvider
+            : mockRevenueByProvider.filter((item) => item.provider === providerFilter)
+
+        // Add provider revenue table
+        const providerTableColumn = ["Provider", "Orders", "Revenue", "Platform Commission"]
+        const providerTableRows = filteredProviderRevenue.map((item) => [
+          item.provider,
+          item.orders.toString(),
+          `₹${item.revenue.toFixed(2)}`,
+          `₹${item.commission.toFixed(2)}`,
+        ])
+
+        // Add provider table
+        autoTable(doc, {
+          head: [providerTableColumn],
+          body: providerTableRows,
+          startY: 65,
+          theme: "grid",
+          styles: { fontSize: 10 },
+          headStyles: { fillColor: [19, 136, 8] }, // Green color
+        })
+
+        // Add orders table
+        const finalY1 = (doc as any).lastAutoTable.finalY + 15
+
+        doc.setFontSize(14)
+        doc.text("Provider Orders", 20, finalY1)
+
+        // Filter orders by provider
+        const filteredOrders = mockOrders
+          .filter((order) => providerFilter === "all" || order.provider === providerFilter)
+          .slice(0, 10)
+
+        const orderTableColumn = ["Order ID", "Customer", "Provider", "Service", "Date", "Amount"]
+        const orderTableRows = filteredOrders.map((order) => [
+          order.id,
+          order.customer,
+          order.provider,
+          order.service,
+          order.date,
+          `₹${order.amount.toFixed(2)}`,
+        ])
+
+        // Add orders table
+        autoTable(doc, {
+          head: [orderTableColumn],
+          body: orderTableRows,
+          startY: finalY1 + 5,
+          theme: "grid",
+          styles: { fontSize: 10 },
+          headStyles: { fillColor: [19, 136, 8] }, // Green color
+        })
+
+        // Add summary
+        const finalY2 = (doc as any).lastAutoTable.finalY + 10
+        const totalAmount = filteredOrders.reduce((sum, order) => sum + order.amount, 0)
+
+        doc.setFontSize(12)
+        doc.text(`Total Orders: ${filteredOrders.length}`, 20, finalY2)
+        doc.text(`Total Revenue: ₹${totalAmount.toFixed(2)}`, 20, finalY2 + 6)
+      } else if (reportType === "service") {
+        // Add service overview
+        doc.setFontSize(14)
+        doc.text("Service Performance", 20, 60)
+
+        // Add service revenue table
+        const serviceTableColumn = ["Service", "Order Count", "Revenue"]
+        const serviceTableRows = mockRevenueByService.map((item) => [
+          item.service,
+          item.count.toString(),
+          `₹${item.revenue.toFixed(2)}`,
+        ])
+
+        // Add service table
+        autoTable(doc, {
+          head: [serviceTableColumn],
+          body: serviceTableRows,
+          startY: 65,
+          theme: "grid",
+          styles: { fontSize: 10 },
+          headStyles: { fillColor: [19, 136, 8] }, // Green color
+        })
+
+        // Add summary
+        const finalY = (doc as any).lastAutoTable.finalY + 10
+        const totalRevenue = mockRevenueByService.reduce((sum, item) => sum + item.revenue, 0)
+        const totalOrders = mockRevenueByService.reduce((sum, item) => sum + item.count, 0)
+
+        doc.setFontSize(12)
+        doc.text(`Total Services: ${mockRevenueByService.length}`, 20, finalY)
+        doc.text(`Total Orders: ${totalOrders}`, 20, finalY + 6)
+        doc.text(`Total Revenue: ₹${totalRevenue.toFixed(2)}`, 20, finalY + 12)
+      }
+
+      // Add footer
+      doc.setFontSize(10)
+      doc.text("Thank you for using LaundryConnect!", 105, 280, { align: "center" })
+      doc.text("For any questions, please contact support@laundryconnect.com", 105, 285, { align: "center" })
+
+      // Save the PDF
+      doc.save(`admin-${reportType}-report-${format(new Date(), "yyyy-MM-dd")}.pdf`)
+
+      toast({
+        title: "Report generated",
+        description: "Your report has been generated and downloaded successfully.",
+      })
+    } catch (error) {
+      console.error("Error generating PDF:", error)
+      toast({
+        title: "Error",
+        description: "There was a problem generating your report. Please try again.",
+        variant: "destructive",
+      })
+    }
   }
-
-  // const generatePDF = () => {
-  //   if (!startDate || !endDate) {
-  //     toast({
-  //       title: "Date range required",
-  //       description: "Please select both start and end dates for the report.",
-  //       variant: "destructive",
-  //     })
-  //     return
-  //   }
-
-  //   const doc = new jsPDF()
-
-  //   // Add title and date range
-  //   doc.setFontSize(18)
-  //   doc.text("Laundry Platform Admin Report", 14, 22)
-
-  //   doc.setFontSize(12)
-  //   doc.text(`Report Period: ${format(startDate, "MMM dd, yyyy")} - ${format(endDate, "MMM dd, yyyy")}`, 14, 32)
-  //   doc.text(`Report Type: ${reportType.charAt(0).toUpperCase() + reportType.slice(1)}`, 14, 38)
-  //   doc.text(`Generated on: ${format(new Date(), "MMM dd, yyyy HH:mm")}`, 14, 44)
-
-  //   // Filter data based on date range
-  //   const startDateStr = format(startDate, "yyyy-MM-dd")
-  //   const endDateStr = format(endDate, "yyyy-MM-dd")
-
-  //   if (reportType === "platform") {
-  //     // Add platform overview
-  //     doc.setFontSize(14)
-  //     doc.text("Platform Overview", 14, 55)
-
-  //     // Filter daily revenue data
-  //     const filteredDailyRevenue = mockDailyRevenue.filter(
-  //       (item) => item.date >= startDateStr && item.date <= endDateStr,
-  //     )
-
-  //     // Calculate totals
-  //     const totalOrders = filteredDailyRevenue.reduce((sum, item) => sum + item.orders, 0)
-  //     const totalRevenue = filteredDailyRevenue.reduce((sum, item) => sum + item.revenue, 0)
-  //     const totalCommission = filteredDailyRevenue.reduce((sum, item) => sum + item.commission, 0)
-
-  //     // Add daily revenue table
-  //     autoTable(doc, {
-  //       startY: 60,
-  //       head: [["Date", "Orders", "Revenue", "Platform Commission"]],
-  //       body: filteredDailyRevenue.map((item) => [
-  //         item.date,
-  //         item.orders,
-  //         `₹{item.revenue.toFixed(2)}`,
-  //         `₹{item.commission.toFixed(2)}`,
-  //       ]),
-  //       foot: [["Total", totalOrders, `₹{totalRevenue.toFixed(2)}`, `₹{totalCommission.toFixed(2)}`]],
-  //     })
-
-  //     // Add provider revenue table
-  //     const currentY = (doc as any).lastAutoTable.finalY + 15
-
-  //     doc.setFontSize(14)
-  //     doc.text("Revenue by Provider", 14, currentY)
-
-  //     autoTable(doc, {
-  //       startY: currentY + 5,
-  //       head: [["Provider", "Orders", "Revenue", "Platform Commission"]],
-  //       body: mockRevenueByProvider.map((item) => [
-  //         item.provider,
-  //         item.orders,
-  //         `₹{item.revenue.toFixed(2)}`,
-  //         `₹{item.commission.toFixed(2)}`,
-  //       ]),
-  //     })
-  //   } else if (reportType === "provider") {
-  //     // Filter by provider if selected
-  //     const filteredProviderRevenue =
-  //       providerFilter === "all"
-  //         ? mockRevenueByProvider
-  //         : mockRevenueByProvider.filter((item) => item.provider === providerFilter)
-
-  //     // Filter orders by provider
-  //     const filteredOrders = mockOrders.filter(
-  //       (order) =>
-  //         order.date >= startDateStr &&
-  //         order.date <= endDateStr &&
-  //         (providerFilter === "all" || order.provider === providerFilter),
-  //     )
-
-  //     // Add provider overview
-  //     doc.setFontSize(14)
-  //     doc.text("Provider Performance", 14, 55)
-
-  //     // Add provider revenue table
-  //     autoTable(doc, {
-  //       startY: 60,
-  //       head: [["Provider", "Orders", "Revenue", "Platform Commission"]],
-  //       body: filteredProviderRevenue.map((item) => [
-  //         item.provider,
-  //         item.orders,
-  //         `₹{item.revenue.toFixed(2)}`,
-  //         `₹{item.commission.toFixed(2)}`,
-  //       ]),
-  //     })
-
-  //     // Add orders table
-  //     const currentY = (doc as any).lastAutoTable.finalY + 15
-
-  //     doc.setFontSize(14)
-  //     doc.text("Provider Orders", 14, currentY)
-
-  //     autoTable(doc, {
-  //       startY: currentY + 5,
-  //       head: [["Order ID", "Customer", "Provider", "Service", "Date", "Amount"]],
-  //       body: filteredOrders.map((order) => [
-  //         order.id,
-  //         order.customer,
-  //         order.provider,
-  //         order.service,
-  //         order.date,
-  //         `₹{order.amount.toFixed(2)}`,
-  //       ]),
-  //     })
-
-  //     // Add summary
-  //     const totalAmount = filteredOrders.reduce((sum, order) => sum + order.amount, 0)
-  //     const finalY = (doc as any).lastAutoTable.finalY + 10
-
-  //     doc.setFontSize(12)
-  //     doc.text(`Total Orders: ${filteredOrders.length}`, 14, finalY)
-  //     doc.text(`Total Revenue: ₹{totalAmount.toFixed(2)}`, 14, finalY + 6)
-  //   } else if (reportType === "service") {
-  //     // Add service overview
-  //     doc.setFontSize(14)
-  //     doc.text("Service Performance", 14, 55)
-
-  //     // Add service revenue table
-  //     autoTable(doc, {
-  //       startY: 60,
-  //       head: [["Service", "Order Count", "Revenue"]],
-  //       body: mockRevenueByService.map((item) => [item.service, item.count, `₹{item.revenue.toFixed(2)}`]),
-  //     })
-
-  //     // Filter orders by date
-  //     const filteredOrders = mockOrders.filter((order) => order.date >= startDateStr && order.date <= endDateStr)
-
-  //     // Group orders by service
-  //     const serviceGroups = {}
-
-  //     filteredOrders.forEach((order) => {
-  //       if (!serviceGroups[order.service]) {
-  //         serviceGroups[order.service] = []
-  //       }
-  //       serviceGroups[order.service].push(order)
-  //     })
-
-  //     // Add service breakdown
-  //     let currentY = (doc as any).lastAutoTable.finalY + 15
-
-  //     Object.entries(serviceGroups).forEach(([service, orders]) => {
-  //       if (currentY > 250) {
-  //         doc.addPage()
-  //         currentY = 20
-  //       }
-
-  //       doc.setFontSize(14)
-  //       doc.text(`${service} Orders`, 14, currentY)
-
-  //       autoTable(doc, {
-  //         startY: currentY + 5,
-  //         head: [["Order ID", "Customer", "Provider", "Date", "Amount"]],
-  //         body: orders.map((order) => [
-  //           order.id,
-  //           order.customer,
-  //           order.provider,
-  //           order.date,
-  //           `₹{order.amount.toFixed(2)}`,
-  //         ]),
-  //       })
-
-  //       currentY = (doc as any).lastAutoTable.finalY + 15
-  //     })
-  //   }
-
-  //   // Save the PDF
-  //   doc.save(`admin-report-${format(new Date(), "yyyy-MM-dd")}.pdf`)
-
-  //   toast({
-  //     title: "Report generated",
-  //     description: "Your report has been generated and downloaded successfully.",
-  //   })
-  // }
 
   return (
     <div className="space-y-6">

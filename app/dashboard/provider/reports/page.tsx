@@ -4,8 +4,8 @@ import { useState } from "react"
 import { CalendarIcon, Download, FileText } from "lucide-react"
 import { format } from "date-fns"
 // Remove jsPDF import if causing errors and replace with a simpler implementation
-// import { jsPDF } from "jspdf"
-// import autoTable from "jspdf-autotable"
+import { jsPDF } from "jspdf"
+import autoTable from "jspdf-autotable"
 
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
@@ -139,22 +139,131 @@ export default function ProviderReportsPage() {
       return
     }
 
-    // Simple implementation without jsPDF if it's causing errors
-    toast({
-      title: "Report generated",
-      description: "Your report has been generated and downloaded successfully.",
-    })
+    try {
+      // Create a new PDF document
+      const doc = new jsPDF()
 
-    // Simulate download
-    setTimeout(() => {
-      const fileName = `provider-report-${format(new Date(), "yyyy-MM-dd")}.pdf`
-      const link = document.createElement("a")
-      link.href = "#"
-      link.download = fileName
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-    }, 1000)
+      // Add company logo/header
+      doc.setFontSize(20)
+      doc.setTextColor(255, 153, 51) // Saffron color
+      doc.text("LaundryConnect", 105, 20, { align: "center" })
+
+      // Add report title
+      doc.setFontSize(16)
+      doc.setTextColor(0, 0, 0)
+      doc.text(`${reportType === "orders" ? "ORDERS REPORT" : "REVENUE REPORT"}`, 105, 30, { align: "center" })
+
+      // Add date range
+      doc.setFontSize(10)
+      doc.text(
+        `Report Period: ${startDate ? format(startDate, "MMM dd, yyyy") : ""} - ${endDate ? format(endDate, "MMM dd, yyyy") : ""}`,
+        105,
+        40,
+        { align: "center" },
+      )
+      doc.text(`Generated on: ${format(new Date(), "MMM dd, yyyy")}`, 105, 45, { align: "center" })
+
+      if (reportType === "orders") {
+        // Add orders table
+        const tableColumn = ["Order ID", "Customer", "Service", "Date", "Status", "Amount"]
+        const tableRows = mockOrders
+          .slice(0, 10)
+          .map((order) => [
+            order.id,
+            order.customer,
+            order.service,
+            order.date,
+            order.status,
+            `₹${order.amount.toFixed(2)}`,
+          ])
+
+        // Add items table
+        autoTable(doc, {
+          head: [tableColumn],
+          body: tableRows,
+          startY: 55,
+          theme: "grid",
+          styles: { fontSize: 10 },
+          headStyles: { fillColor: [19, 136, 8] }, // Green color
+        })
+
+        // Add summary
+        const finalY = (doc as any).lastAutoTable.finalY + 10
+        const totalAmount = mockOrders.slice(0, 10).reduce((sum, order) => sum + order.amount, 0)
+
+        doc.setFontSize(12)
+        doc.text(`Total Orders: ${mockOrders.slice(0, 10).length}`, 20, finalY)
+        doc.text(`Total Revenue: ₹${totalAmount.toFixed(2)}`, 20, finalY + 6)
+      } else {
+        // Add revenue overview table
+        const revenueTableColumn = ["Date", "Orders", "Revenue"]
+        const revenueTableRows = mockDailyRevenue
+          .slice(0, 5)
+          .map((item) => [item.date, item.orders.toString(), `₹${item.revenue.toFixed(2)}`])
+
+        // Add revenue table
+        autoTable(doc, {
+          head: [revenueTableColumn],
+          body: revenueTableRows,
+          startY: 55,
+          theme: "grid",
+          styles: { fontSize: 10 },
+          headStyles: { fillColor: [19, 136, 8] }, // Green color
+        })
+
+        // Add service revenue table
+        const finalY1 = (doc as any).lastAutoTable.finalY + 15
+
+        doc.setFontSize(14)
+        doc.text("Revenue by Service", 20, finalY1)
+
+        const serviceTableColumn = ["Service", "Order Count", "Revenue"]
+        const serviceTableRows = mockRevenueByService.map((item) => [
+          item.service,
+          item.count.toString(),
+          `₹${item.revenue.toFixed(2)}`,
+        ])
+
+        // Add service table
+        autoTable(doc, {
+          head: [serviceTableColumn],
+          body: serviceTableRows,
+          startY: finalY1 + 5,
+          theme: "grid",
+          styles: { fontSize: 10 },
+          headStyles: { fillColor: [19, 136, 8] }, // Green color
+        })
+
+        // Add summary
+        const finalY2 = (doc as any).lastAutoTable.finalY + 10
+        const totalRevenue = mockRevenueByService.reduce((sum, item) => sum + item.revenue, 0)
+        const totalOrders = mockRevenueByService.reduce((sum, item) => sum + item.count, 0)
+
+        doc.setFontSize(12)
+        doc.text(`Total Orders: ${totalOrders}`, 20, finalY2)
+        doc.text(`Total Revenue: ₹${totalRevenue.toFixed(2)}`, 20, finalY2 + 6)
+      }
+
+      // Add footer
+      doc.setFontSize(10)
+      doc.text("Thank you for using LaundryConnect!", 105, 280, { align: "center" })
+      doc.text("For any questions, please contact support@laundryconnect.com", 105, 285, { align: "center" })
+
+      // Save the PDF
+      doc.save(`provider-${reportType}-report-${format(new Date(), "yyyy-MM-dd")}.pdf`)
+
+      toast({
+        title: "Report generated",
+        description: "Your report has been generated and downloaded successfully.",
+      })
+    } catch (error) {
+      console.error("Error generating PDF:", error)
+      toast({
+        title: "Error",
+        description: "There was a problem generating your report. Please try again.",
+        variant: "destructive",
+      })
+    }
   }
 
   return (

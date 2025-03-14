@@ -12,14 +12,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress"
 import { useToast } from "@/components/ui/use-toast"
 
-// Mock data for the order (same as in the order details page)
+// Update the orderData object to use ₹ instead of $
 const orderData = {
   id: "1234",
   date: "Mar 14, 2023",
   status: "In Progress",
   service: "Standard Wash",
   weight: "5 kg",
-  amount: "$24.99",
+  amount: "₹999",
   paymentMethod: "Visa ending in 4242",
   specialInstructions: "Please handle with care. There are some delicate items.",
   timeline: [
@@ -58,22 +58,124 @@ const orderData = {
   ],
   provider: {
     name: "CleanCo Laundry",
-    address: "789 Laundry St, New York, NY 10003",
-    phone: "+1 (555) 987-6543",
+    address: "789 Laundry St, Mumbai, MH 400001",
+    phone: "+91 98765 43210",
     rating: 4.8,
   },
   items: [
-    { name: "T-shirts", quantity: 3, price: "$9.00" },
-    { name: "Pants", quantity: 2, price: "$8.00" },
-    { name: "Shirts", quantity: 2, price: "$6.00" },
-    { name: "Socks (pairs)", quantity: 4, price: "$2.00" },
+    { name: "T-shirts", quantity: 3, price: "₹300" },
+    { name: "Pants", quantity: 2, price: "₹400" },
+    { name: "Shirts", quantity: 2, price: "₹200" },
+    { name: "Socks (pairs)", quantity: 4, price: "₹100" },
   ],
   address: {
     type: "Home",
     street: "123 Main St, Apt 4B",
-    city: "New York, NY 10001",
-    phone: "+1 (555) 123-4567",
+    city: "Mumbai, MH 400001",
+    phone: "+91 98765 12345",
   },
+}
+
+// Update the generatePDF function to use Indian theme colors
+const generatePDF = (params: { id: string }, router: any, toast: any, setIsGenerating: any) => {
+  try {
+    setIsGenerating(true)
+
+    // Create a new PDF document
+    const doc = new jsPDF()
+
+    // Add company logo/header
+    doc.setFontSize(20)
+    doc.setTextColor(255, 153, 51) // Saffron color
+    doc.text("LaundryConnect", 105, 20, { align: "center" })
+
+    // Add invoice title
+    doc.setFontSize(16)
+    doc.setTextColor(0, 0, 0)
+    doc.text(`ORDER RECEIPT #${params.id}`, 105, 30, { align: "center" })
+
+    // Add date and status
+    doc.setFontSize(10)
+    doc.text(`Date: ${orderData.date}`, 20, 40)
+    doc.text(`Status: ${orderData.status}`, 20, 45)
+
+    // Add customer information
+    doc.setFontSize(12)
+    doc.text("Customer Information", 20, 55)
+    doc.setFontSize(10)
+    doc.text(`Address: ${orderData.address.street}, ${orderData.address.city}`, 20, 62)
+    doc.text(`Phone: ${orderData.address.phone}`, 20, 67)
+
+    // Add service provider information
+    doc.setFontSize(12)
+    doc.text("Service Provider", 120, 55)
+    doc.setFontSize(10)
+    doc.text(`${orderData.provider.name}`, 120, 62)
+    doc.text(`${orderData.provider.phone}`, 120, 67)
+
+    // Add order details
+    doc.setFontSize(12)
+    doc.text("Order Details", 20, 80)
+
+    // Create table for items
+    const tableColumn = ["Item", "Quantity", "Price"]
+    const tableRows = orderData.items.map((item) => [item.name, item.quantity.toString(), item.price])
+
+    // Add items table
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: 85,
+      theme: "grid",
+      styles: { fontSize: 10 },
+      headStyles: { fillColor: [19, 136, 8] }, // Green color
+    })
+
+    // Add total
+    const finalY = (doc as any).lastAutoTable.finalY + 10
+    doc.text("Service Type:", 20, finalY)
+    doc.text(orderData.service, 70, finalY)
+
+    doc.text("Weight:", 20, finalY + 5)
+    doc.text(orderData.weight, 70, finalY + 5)
+
+    doc.text("Payment Method:", 20, finalY + 10)
+    doc.text(orderData.paymentMethod, 70, finalY + 10)
+
+    doc.setFontSize(12)
+    doc.text("Total Amount:", 20, finalY + 20)
+    doc.setFont("helvetica", "bold")
+    doc.text(orderData.amount, 70, finalY + 20)
+
+    // Add footer
+    doc.setFont("helvetica", "normal")
+    doc.setFontSize(10)
+    doc.text("Thank you for using LaundryConnect!", 105, finalY + 35, { align: "center" })
+    doc.text("For any questions, please contact support@laundryconnect.com", 105, finalY + 40, { align: "center" })
+
+    // Save the PDF
+    doc.save(`LaundryConnect_Order_${params.id}.pdf`)
+
+    // Show success toast
+    toast({
+      title: "PDF Generated",
+      description: "Your order receipt has been downloaded.",
+    })
+
+    // Redirect back to order page after a short delay
+    setTimeout(() => {
+      setIsGenerating(false)
+      router.push(`/dashboard/customer/orders/${params.id}`)
+    }, 1000)
+  } catch (error) {
+    console.error("Error generating PDF:", error)
+    toast({
+      title: "Error",
+      description: "There was a problem generating your PDF. Please try again.",
+      variant: "destructive",
+    })
+    setIsGenerating(false)
+  }
 }
 
 export default function DownloadOrderPage({ params }: { params: { id: string } }) {
@@ -83,109 +185,8 @@ export default function DownloadOrderPage({ params }: { params: { id: string } }
 
   useEffect(() => {
     // Generate PDF on component mount
-    generatePDF()
-  }, [])
-
-  const generatePDF = () => {
-    try {
-      setIsGenerating(true)
-
-      // Create a new PDF document
-      const doc = new jsPDF()
-
-      // Add company logo/header
-      doc.setFontSize(20)
-      doc.setTextColor(41, 98, 255) // Primary color
-      doc.text("LaundryConnect", 105, 20, { align: "center" })
-
-      // Add invoice title
-      doc.setFontSize(16)
-      doc.setTextColor(0, 0, 0)
-      doc.text(`ORDER RECEIPT #${params.id}`, 105, 30, { align: "center" })
-
-      // Add date and status
-      doc.setFontSize(10)
-      doc.text(`Date: ${orderData.date}`, 20, 40)
-      doc.text(`Status: ${orderData.status}`, 20, 45)
-
-      // Add customer information
-      doc.setFontSize(12)
-      doc.text("Customer Information", 20, 55)
-      doc.setFontSize(10)
-      doc.text(`Address: ${orderData.address.street}, ${orderData.address.city}`, 20, 62)
-      doc.text(`Phone: ${orderData.address.phone}`, 20, 67)
-
-      // Add service provider information
-      doc.setFontSize(12)
-      doc.text("Service Provider", 120, 55)
-      doc.setFontSize(10)
-      doc.text(`${orderData.provider.name}`, 120, 62)
-      doc.text(`${orderData.provider.phone}`, 120, 67)
-
-      // Add order details
-      doc.setFontSize(12)
-      doc.text("Order Details", 20, 80)
-
-      // Create table for items
-      const tableColumn = ["Item", "Quantity", "Price"]
-      const tableRows = orderData.items.map((item) => [item.name, item.quantity.toString(), item.price])
-
-      // Add items table
-      autoTable(doc, {
-        head: [tableColumn],
-        body: tableRows,
-        startY: 85,
-        theme: "grid",
-        styles: { fontSize: 10 },
-        headStyles: { fillColor: [41, 98, 255] },
-      })
-
-      // Add total
-      const finalY = (doc as any).lastAutoTable.finalY + 10
-      doc.text("Service Type:", 20, finalY)
-      doc.text(orderData.service, 70, finalY)
-
-      doc.text("Weight:", 20, finalY + 5)
-      doc.text(orderData.weight, 70, finalY + 5)
-
-      doc.text("Payment Method:", 20, finalY + 10)
-      doc.text(orderData.paymentMethod, 70, finalY + 10)
-
-      doc.setFontSize(12)
-      doc.text("Total Amount:", 20, finalY + 20)
-      doc.setFont("helvetica", "bold")
-      doc.text(orderData.amount, 70, finalY + 20)
-
-      // Add footer
-      doc.setFont("helvetica", "normal")
-      doc.setFontSize(10)
-      doc.text("Thank you for using LaundryConnect!", 105, finalY + 35, { align: "center" })
-      doc.text("For any questions, please contact support@laundryconnect.com", 105, finalY + 40, { align: "center" })
-
-      // Save the PDF
-      doc.save(`LaundryConnect_Order_${params.id}.pdf`)
-
-      // Show success toast
-      toast({
-        title: "PDF Generated",
-        description: "Your order receipt has been downloaded.",
-      })
-
-      // Redirect back to order page after a short delay
-      setTimeout(() => {
-        setIsGenerating(false)
-        router.push(`/dashboard/customer/orders/${params.id}`)
-      }, 1000)
-    } catch (error) {
-      console.error("Error generating PDF:", error)
-      toast({
-        title: "Error",
-        description: "There was a problem generating your PDF. Please try again.",
-        variant: "destructive",
-      })
-      setIsGenerating(false)
-    }
-  }
+    generatePDF(params, router, toast, setIsGenerating)
+  }, [params, router, toast, setIsGenerating])
 
   return (
     <div className="space-y-6">
@@ -227,7 +228,7 @@ export default function DownloadOrderPage({ params }: { params: { id: string } }
               <Download className="h-16 w-16 text-primary" />
               <p>Download complete!</p>
               <div className="flex gap-2">
-                <Button variant="outline" onClick={generatePDF}>
+                <Button variant="outline" onClick={() => generatePDF(params, router, toast, setIsGenerating)}>
                   Download Again
                 </Button>
                 <Button onClick={() => router.push(`/dashboard/customer/orders/${params.id}`)}>Return to Order</Button>
