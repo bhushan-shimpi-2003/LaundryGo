@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Calendar, DollarSign, Package, ShoppingCart, TrendingUp, Users } from "lucide-react"
+import { Calendar, IndianRupee, Package, ShoppingCart, TrendingUp, Users } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -41,10 +41,10 @@ export default function AnalyticsPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <IndianRupee className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$24,325.50</div>
+            <div className="text-2xl font-bold">₹24,32,550</div>
             <p className="text-xs text-muted-foreground">
               <span className="text-green-500">+12%</span> from previous period
             </p>
@@ -186,7 +186,7 @@ export default function AnalyticsPage() {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">
-                      <p className="text-sm font-medium">New York, NY</p>
+                      <p className="text-sm font-medium">Mumbai, MH</p>
                       <div className="h-2 w-full rounded-full bg-muted">
                         <div className="h-2 rounded-full bg-primary" style={{ width: "82%" }}></div>
                       </div>
@@ -195,7 +195,7 @@ export default function AnalyticsPage() {
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">
-                      <p className="text-sm font-medium">Los Angeles, CA</p>
+                      <p className="text-sm font-medium">Delhi, DL</p>
                       <div className="h-2 w-full rounded-full bg-muted">
                         <div className="h-2 rounded-full bg-primary" style={{ width: "67%" }}></div>
                       </div>
@@ -204,7 +204,7 @@ export default function AnalyticsPage() {
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">
-                      <p className="text-sm font-medium">Chicago, IL</p>
+                      <p className="text-sm font-medium">Bangalore, KA</p>
                       <div className="h-2 w-full rounded-full bg-muted">
                         <div className="h-2 rounded-full bg-primary" style={{ width: "53%" }}></div>
                       </div>
@@ -213,7 +213,7 @@ export default function AnalyticsPage() {
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">
-                      <p className="text-sm font-medium">Houston, TX</p>
+                      <p className="text-sm font-medium">Hyderabad, TS</p>
                       <div className="h-2 w-full rounded-full bg-muted">
                         <div className="h-2 rounded-full bg-primary" style={{ width: "41%" }}></div>
                       </div>
@@ -222,7 +222,7 @@ export default function AnalyticsPage() {
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">
-                      <p className="text-sm font-medium">Phoenix, AZ</p>
+                      <p className="text-sm font-medium">Chennai, TN</p>
                       <div className="h-2 w-full rounded-full bg-muted">
                         <div className="h-2 rounded-full bg-primary" style={{ width: "32%" }}></div>
                       </div>
@@ -314,9 +314,9 @@ export default function AnalyticsPage() {
               </CardHeader>
               <CardContent className="h-[250px] flex items-center justify-center">
                 <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                  <DollarSign className="h-16 w-16" />
+                  <IndianRupee className="h-16 w-16" />
                   <p>Average order value chart would be displayed here</p>
-                  <p className="text-sm">Current average: $24.75</p>
+                  <p className="text-sm">Current average: ₹1,099</p>
                 </div>
               </CardContent>
             </Card>
@@ -436,10 +436,10 @@ export default function AnalyticsPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                        <span className="text-xs font-medium text-primary">CC</span>
+                        <span className="text-xs font-medium text-primary">SL</span>
                       </div>
                       <div>
-                        <p className="text-sm font-medium">CleanCo Laundry</p>
+                        <p className="text-sm font-medium">Swachh Laundry Services</p>
                         <div className="flex items-center">
                           {[1, 2, 3, 4, 5].map((star) => (
                             <svg
@@ -465,10 +465,10 @@ export default function AnalyticsPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                        <span className="text-xs font-medium text-primary">FF</span>
+                        <span className="text-xs font-medium text-primary">VL</span>
                       </div>
                       <div>
-                        <p className="text-sm font-medium">Fresh Fold Services</p>
+                        <p className="text-sm font-medium">Vastra Laundry</p>
                         <div className="flex items-center">
                           {[1, 2, 3, 4, 5].map((star) => (
                             <svg
@@ -494,10 +494,10 @@ export default function AnalyticsPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                        <span className="text-xs font-medium text-primary">LE</span>
+                        <span className="text-xs font-medium text-primary">QL</span>
                       </div>
                       <div>
-                        <p className="text-sm font-medium">Laundry Express</p>
+                        <p className="text-sm font-medium">Quick Laundry Express</p>
                         <div className="flex items-center">
                           {[1, 2, 3, 4, 5].map((star) => (
                             <svg
