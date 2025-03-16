@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Calendar, Edit, Mail, MapPin, Phone, ShoppingCart, User } from "lucide-react"
+import { ArrowLeft, Calendar, Edit, Mail, MapPin, Phone, ShoppingCart, User, CheckCircle } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -265,9 +265,8 @@ export default function CustomerDetailsPage({ params }: { params: { id: string }
       </div>
 
       <Tabs defaultValue="profile" value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 lg:w-[400px]">
+        <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
           <TabsTrigger value="profile">Profile</TabsTrigger>
-          <TabsTrigger value="orders">Orders</TabsTrigger>
           <TabsTrigger value="addresses">Addresses</TabsTrigger>
         </TabsList>
 
@@ -314,14 +313,65 @@ export default function CustomerDetailsPage({ params }: { params: { id: string }
                 <div className="flex items-center gap-2">
                   <span
                     className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
-                    ${customerStatus === "Active" ? "bg-green-100 text-green-800" : ""}
-                    ${customerStatus === "Inactive" ? "bg-gray-100 text-gray-800" : ""}
-                    ${customerStatus === "Suspended" ? "bg-red-100 text-red-800" : ""}
-                  `}
+              ${customerStatus === "Active" ? "bg-green-100 text-green-800" : ""}
+              ${customerStatus === "Inactive" ? "bg-gray-100 text-gray-800" : ""}
+              ${customerStatus === "Suspended" ? "bg-red-100 text-red-800" : ""}
+            `}
                   >
                     {customerStatus}
                   </span>
                   <p className="text-sm text-muted-foreground">Last updated: Today</p>
+                </div>
+              </div>
+
+              <Separator />
+
+              <div className="space-y-2">
+                <h4 className="font-medium">Administrative Notes</h4>
+                <div className="rounded-md border p-3 bg-muted/20">
+                  <p className="text-sm text-muted-foreground">
+                    No administrative notes have been added for this customer.
+                  </p>
+                </div>
+                <Button variant="outline" size="sm">
+                  <Edit className="mr-2 h-4 w-4" />
+                  Add Note
+                </Button>
+              </div>
+
+              <Separator />
+
+              <div className="space-y-2">
+                <h4 className="font-medium">Account Verification</h4>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-green-100 text-green-800">
+                      Verified
+                    </span>
+                    <p className="text-sm text-muted-foreground">
+                      Email verified on {new Date(customerData.joinDate).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <Button variant="outline" size="sm">
+                    Verify Again
+                  </Button>
+                </div>
+              </div>
+
+              <Separator />
+
+              <div className="space-y-2">
+                <h4 className="font-medium">Administrative Actions</h4>
+                <div className="flex flex-wrap gap-2">
+                  <Button variant="outline" size="sm" className="border-yellow-200 hover:bg-yellow-50">
+                    Send Password Reset
+                  </Button>
+                  <Button variant="outline" size="sm" className="border-blue-200 hover:bg-blue-50">
+                    Login as Customer
+                  </Button>
+                  <Button variant="outline" size="sm" className="border-red-200 hover:bg-red-50 text-red-500">
+                    Suspend Account
+                  </Button>
                 </div>
               </div>
             </CardContent>
@@ -332,55 +382,76 @@ export default function CustomerDetailsPage({ params }: { params: { id: string }
               </Button>
             </CardFooter>
           </Card>
-        </TabsContent>
 
-        <TabsContent value="orders" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Order History</CardTitle>
-              <CardDescription>View all orders placed by this customer</CardDescription>
+              <CardTitle>Account Activity</CardTitle>
+              <CardDescription>Recent account activity and statistics</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="rounded-md border">
-                <div className="grid grid-cols-5 p-3 text-sm font-medium">
-                  <div>Order ID</div>
-                  <div>Date</div>
-                  <div>Service</div>
-                  <div>Amount</div>
-                  <div>Status</div>
-                </div>
-                <Separator />
-                {customerData.recentOrders.map((order) => (
-                  <div key={order.id} className="grid grid-cols-5 p-3 text-sm items-center">
-                    <div className="font-medium">#{order.id}</div>
-                    <div>{order.date}</div>
-                    <div>{order.service}</div>
-                    <div>{order.amount}</div>
-                    <div>
-                      <span
-                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
-                        ${order.status === "Pending" ? "bg-orange-100 text-orange-800" : ""}
-                        ${order.status === "Processing" ? "bg-yellow-100 text-yellow-800" : ""}
-                        ${order.status === "Ready" ? "bg-blue-100 text-blue-800" : ""}
-                        ${order.status === "Delivered" ? "bg-green-100 text-green-800" : ""}
-                      `}
-                      >
-                        {order.status}
-                      </span>
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="rounded-lg border p-3">
+                    <div className="text-sm font-medium">Last Login</div>
+                    <div className="mt-1 text-2xl font-bold">2 days ago</div>
+                    <div className="mt-1 text-xs text-muted-foreground">May 14, 2023 at 10:23 AM</div>
+                  </div>
+                  <div className="rounded-lg border p-3">
+                    <div className="text-sm font-medium">Login Attempts</div>
+                    <div className="mt-1 text-2xl font-bold">12</div>
+                    <div className="mt-1 text-xs text-muted-foreground">All successful</div>
+                  </div>
+                  <div className="rounded-lg border p-3">
+                    <div className="text-sm font-medium">Password Changes</div>
+                    <div className="mt-1 text-2xl font-bold">1</div>
+                    <div className="mt-1 text-xs text-muted-foreground">Last changed 3 months ago</div>
+                  </div>
+                  <div className="rounded-lg border p-3">
+                    <div className="text-sm font-medium">Account Age</div>
+                    <div className="mt-1 text-2xl font-bold">4 months</div>
+                    <div className="mt-1 text-xs text-muted-foreground">
+                      Since {new Date(customerData.joinDate).toLocaleDateString()}
                     </div>
                   </div>
-                ))}
+                </div>
+
+                <Separator />
+
+                <div>
+                  <h4 className="text-sm font-medium mb-2">Recent Activity</h4>
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center text-sm">
+                      <div className="flex items-center gap-2">
+                        <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                        <span>Logged in successfully</span>
+                      </div>
+                      <span className="text-xs text-muted-foreground">2 days ago</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm">
+                      <div className="flex items-center gap-2">
+                        <div className="h-2 w-2 rounded-full bg-blue-500"></div>
+                        <span>Updated profile information</span>
+                      </div>
+                      <span className="text-xs text-muted-foreground">1 week ago</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm">
+                      <div className="flex items-center gap-2">
+                        <div className="h-2 w-2 rounded-full bg-orange-500"></div>
+                        <span>Added new address</span>
+                      </div>
+                      <span className="text-xs text-muted-foreground">2 weeks ago</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm">
+                      <div className="flex items-center gap-2">
+                        <div className="h-2 w-2 rounded-full bg-purple-500"></div>
+                        <span>Changed password</span>
+                      </div>
+                      <span className="text-xs text-muted-foreground">3 months ago</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </CardContent>
-            <CardFooter>
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => router.push(`/dashboard/admin/orders?customer=${customerData.id}`)}
-              >
-                View All Orders
-              </Button>
-            </CardFooter>
           </Card>
         </TabsContent>
 
@@ -408,6 +479,7 @@ export default function CustomerDetailsPage({ params }: { params: { id: string }
                   </div>
                   <div className="flex gap-2 mt-4">
                     <Button variant="outline" size="sm">
+                      <Edit className="mr-2 h-4 w-4" />
                       Edit
                     </Button>
                     {!address.isDefault && (
@@ -418,15 +490,55 @@ export default function CustomerDetailsPage({ params }: { params: { id: string }
                     <Button variant="outline" size="sm" className="text-destructive">
                       Delete
                     </Button>
+                    <Button variant="outline" size="sm">
+                      Verify Address
+                    </Button>
                   </div>
                 </div>
               ))}
             </CardContent>
-            <CardFooter>
+            <CardFooter className="flex flex-col gap-2">
               <Button variant="outline" className="w-full">
                 Add New Address
               </Button>
+              <div className="text-xs text-muted-foreground text-center mt-2">
+                All addresses are verified for delivery eligibility
+              </div>
             </CardFooter>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Address Verification</CardTitle>
+              <CardDescription>Verify customer addresses for service availability</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="rounded-md border p-3 bg-green-50">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-green-500" />
+                    <p className="text-sm font-medium text-green-700">All addresses are in serviceable areas</p>
+                  </div>
+                  <p className="text-xs text-green-600 mt-1 ml-6">
+                    This customer's addresses are all within our service provider coverage areas.
+                  </p>
+                </div>
+
+                <div className="rounded-md border p-3">
+                  <h4 className="text-sm font-medium mb-2">Service Provider Coverage</h4>
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center text-sm">
+                      <span>Home Address</span>
+                      <span className="text-xs text-green-600">4 providers available</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm">
+                      <span>Work Address</span>
+                      <span className="text-xs text-green-600">6 providers available</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
