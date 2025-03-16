@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Calendar, Clock, Download, MapPin, Phone, Printer, Truck, User, FileText } from "lucide-react"
+import { ArrowLeft, Calendar, Clock, MapPin, Phone, Printer, Truck, User, FileText } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -116,14 +116,6 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
           </div>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm">
-            <Printer className="mr-2 h-4 w-4" />
-            Print
-          </Button>
-          <Button variant="outline" size="sm">
-            <Download className="mr-2 h-4 w-4" />
-            Download
-          </Button>
           <Link href={`/dashboard/provider/orders/${params.id}/invoice`}>
             <Button variant="outline" size="sm">
               <FileText className="mr-2 h-4 w-4" />

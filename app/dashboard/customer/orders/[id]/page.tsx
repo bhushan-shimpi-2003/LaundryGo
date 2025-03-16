@@ -3,7 +3,7 @@
 import { useState, useRef } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Calendar, Clock, Download, MapPin, Phone, Printer, Shirt, Truck, FileText } from "lucide-react"
+import { ArrowLeft, Calendar, Clock, MapPin, Phone, Printer, Shirt, Truck, FileText } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 
 import { Button } from "@/components/ui/button"
@@ -101,11 +101,6 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
     }
   }
 
-  // Handle download functionality
-  const handleDownload = () => {
-    router.push(`/dashboard/customer/orders/${params.id}/download`)
-  }
-
   // Handle contact support
   const handleContactSupport = () => {
     router.push(`/dashboard/customer/support?order=${params.id}`)
@@ -129,14 +124,6 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
           </div>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={handlePrint}>
-            <Printer className="mr-2 h-4 w-4" />
-            Print
-          </Button>
-          <Button variant="outline" size="sm" onClick={handleDownload}>
-            <Download className="mr-2 h-4 w-4" />
-            Download
-          </Button>
           <Link href={`/dashboard/customer/orders/${params.id}/invoice`}>
             <Button variant="outline" size="sm">
               <FileText className="mr-2 h-4 w-4" />
