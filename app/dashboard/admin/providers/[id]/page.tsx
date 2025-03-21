@@ -1,477 +1,405 @@
 "use client"
 
 import { useState } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { ArrowLeft, Edit, Mail, MapPin, Phone, ShoppingCart, Star, Store } from "lucide-react"
+import { useParams } from "next/navigation"
+import {
+  ArrowLeft,
+  Calendar,
+  Clock,
+  Edit,
+  FileText,
+  Lock,
+  Mail,
+  MapPin,
+  Phone,
+  Shield,
+  Star,
+  Store,
+  UserCheck,
+  UserX,
+} from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useToast } from "@/components/ui/use-toast"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+import { useToast } from "@/components/ui/use-toast"
 
-// Mock data for the provider
+// Mock provider data
 const providerData = {
   id: "SP001",
   name: "CleanCo Laundry",
   email: "info@cleanco.com",
-  phone: "+1 (555) 987-6543",
-  location: "New York, NY",
-  address: "789 Laundry St, New York, NY 10003",
+  phone: "+91 98765 43210",
+  location: "Mumbai, Maharashtra",
   joinDate: "2022-10-15",
   status: "Active",
   orders: 245,
   rating: 4.8,
-  revenue: "$12,450.75",
-  description:
-    "CleanCo Laundry is a premium laundry service provider with over 5 years of experience. We specialize in handling all types of fabrics with care and use eco-friendly detergents.",
+  revenue: "₹124,507.75",
+  lastLogin: "2023-05-09 10:15:30",
+  verificationStatus: "Verified",
+  accountType: "Premium",
+  gstNumber: "27AADCB2230M1ZP",
+  panNumber: "AADCB2230M",
   services: [
-    {
-      id: "service1",
-      name: "Standard Wash",
-      price: "$9.99",
-      turnaround: "48 hours",
-    },
-    {
-      id: "service2",
-      name: "Premium Wash",
-      price: "$14.99",
-      turnaround: "48 hours",
-    },
-    {
-      id: "service3",
-      name: "Dry Cleaning",
-      price: "$19.99",
-      turnaround: "72 hours",
-    },
-    {
-      id: "service4",
-      name: "Ironing",
-      price: "$7.99",
-      turnaround: "24 hours",
-    },
-    {
-      id: "service5",
-      name: "Wash & Iron",
-      price: "$16.99",
-      turnaround: "72 hours",
-    },
+    { id: "S001", name: "Wash & Fold", price: "₹80/kg" },
+    { id: "S002", name: "Dry Cleaning", price: "₹250/item" },
+    { id: "S003", name: "Ironing", price: "₹20/item" },
+    { id: "S004", name: "Premium Wash", price: "₹120/kg" },
   ],
-  recentOrders: [
-    {
-      id: "1234",
-      customer: "John Doe",
-      date: "Mar 14, 2023",
-      service: "Standard Wash",
-      amount: "$24.99",
-      status: "Processing",
-    },
-    {
-      id: "1237",
-      customer: "Jennifer Lee",
-      date: "Mar 14, 2023",
-      service: "Wash & Iron",
-      amount: "$38.75",
-      status: "Processing",
-    },
-    {
-      id: "1235",
-      customer: "Sarah Johnson",
-      date: "Mar 15, 2023",
-      service: "Premium Wash",
-      amount: "$29.99",
-      status: "Pending",
-    },
-    {
-      id: "1239",
-      customer: "Amanda Garcia",
-      date: "Mar 12, 2023",
-      service: "Premium Wash",
-      amount: "$32.50",
-      status: "Ready",
-    },
-    {
-      id: "1225",
-      customer: "Michael Brown",
-      date: "Mar 10, 2023",
-      service: "Dry Cleaning",
-      amount: "$45.50",
-      status: "Delivered",
-    },
+  address: {
+    street: "123 Business Park, Andheri East",
+    city: "Mumbai",
+    state: "Maharashtra",
+    postalCode: "400069",
+    isVerified: true,
+  },
+  activityLog: [
+    { date: "2023-05-09 10:15:30", action: "Logged in", ip: "192.168.1.1" },
+    { date: "2023-05-07 14:22:10", action: "Updated service prices", ip: "192.168.1.1" },
+    { date: "2023-05-05 09:30:45", action: "Completed order #ORD-2023-05-012", ip: "192.168.1.1" },
+    { date: "2023-05-01 16:40:22", action: "Added new service", ip: "192.168.1.1" },
   ],
 }
 
-export default function ProviderDetailsPage({ params }: { params: { id: string } }) {
-  const router = useRouter()
+export default function ProviderDetailsPage() {
+  const { id } = useParams()
   const { toast } = useToast()
-  const [activeTab, setActiveTab] = useState("profile")
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
-  const [providerStatus, setProviderStatus] = useState(providerData.status)
+  const [adminNotes, setAdminNotes] = useState(
+    "Provider has excellent track record. Specializes in premium laundry services. Offers pickup and delivery within 5km radius.",
+  )
+  const [isEditingNotes, setIsEditingNotes] = useState(false)
 
-  const handleStatusChange = (newStatus: string) => {
-    setProviderStatus(newStatus)
+  const handleSaveNotes = () => {
+    setIsEditingNotes(false)
     toast({
-      title: "Provider Status Updated",
-      description: `${providerData.name}'s status has been updated to ${newStatus}.`,
+      title: "Notes Updated",
+      description: "Administrative notes have been updated successfully.",
     })
   }
 
-  const handleSaveChanges = () => {
-    setIsEditDialogOpen(false)
+  const handleStatusChange = (newStatus: string) => {
     toast({
-      title: "Provider Updated",
-      description: "Provider information has been updated successfully.",
+      title: "Status Updated",
+      description: `Provider status changed to ${newStatus}.`,
+    })
+  }
+
+  const handleResetPassword = () => {
+    toast({
+      title: "Password Reset Email Sent",
+      description: "A password reset link has been sent to the provider's email.",
     })
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div className="flex items-center gap-2">
-          <Link href="/dashboard/admin/providers">
-            <Button variant="outline" size="icon" className="h-8 w-8">
-              <ArrowLeft className="h-4 w-4" />
-              <span className="sr-only">Back</span>
-            </Button>
-          </Link>
-          <div>
-            <h2 className="text-2xl font-bold tracking-tight">{providerData.name}</h2>
-            <p className="text-muted-foreground">
-              Provider since {new Date(providerData.joinDate).toLocaleDateString()} • {providerStatus}
-            </p>
-          </div>
+      <div className="flex items-center gap-4">
+        <Button variant="outline" size="icon" asChild>
+          <a href="/dashboard/admin/providers">
+            <ArrowLeft className="h-4 w-4" />
+            <span className="sr-only">Back</span>
+          </a>
+        </Button>
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight">Provider Details</h2>
+          <p className="text-muted-foreground">View and manage service provider information</p>
         </div>
-        <div className="flex gap-2">
-          <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="sm">
-                <Edit className="mr-2 h-4 w-4" />
-                Edit Provider
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px]">
-              <DialogHeader>
-                <DialogTitle>Edit Provider</DialogTitle>
-                <DialogDescription>Make changes to the provider's information here.</DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="name" className="text-right">
-                    Name
-                  </Label>
-                  <Input id="name" defaultValue={providerData.name} className="col-span-3" />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="email" className="text-right">
-                    Email
-                  </Label>
-                  <Input id="email" defaultValue={providerData.email} className="col-span-3" />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="phone" className="text-right">
-                    Phone
-                  </Label>
-                  <Input id="phone" defaultValue={providerData.phone} className="col-span-3" />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="address" className="text-right">
-                    Address
-                  </Label>
-                  <Input id="address" defaultValue={providerData.address} className="col-span-3" />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="status" className="text-right">
-                    Status
-                  </Label>
-                  <Select defaultValue={providerStatus} onValueChange={handleStatusChange}>
-                    <SelectTrigger id="status" className="col-span-3">
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Active">Active</SelectItem>
-                      <SelectItem value="Pending">Pending</SelectItem>
-                      <SelectItem value="Suspended">Suspended</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid grid-cols-4 items-start gap-4">
-                  <Label htmlFor="description" className="text-right">
-                    Description
-                  </Label>
-                  <Textarea id="description" defaultValue={providerData.description} className="col-span-3" />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
-                  Cancel
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2">
+        {/* Provider Profile Card */}
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle>Provider Profile</CardTitle>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm">
+                  <Edit className="mr-2 h-4 w-4" />
+                  Edit
                 </Button>
-                <Button onClick={handleSaveChanges}>Save changes</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-          <Select value={providerStatus} onValueChange={handleStatusChange}>
-            <SelectTrigger className="w-[150px]">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Active">Active</SelectItem>
-              <SelectItem value="Pending">Pending</SelectItem>
-              <SelectItem value="Suspended">Suspended</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
-            <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+              </div>
+            </div>
+            <CardDescription>Basic information and account details</CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{providerData.orders}</div>
-            <p className="text-xs text-muted-foreground">+32 from last month</p>
+          <CardContent className="space-y-4">
+            <div className="flex flex-col space-y-1.5">
+              <Label>Provider ID</Label>
+              <div className="flex items-center gap-2 rounded-md border p-2">
+                <Store className="h-4 w-4 text-muted-foreground" />
+                <span>{providerData.id}</span>
+              </div>
+            </div>
+            <div className="flex flex-col space-y-1.5">
+              <Label>Business Name</Label>
+              <div className="flex items-center gap-2 rounded-md border p-2">
+                <Store className="h-4 w-4 text-muted-foreground" />
+                <span>{providerData.name}</span>
+              </div>
+            </div>
+            <div className="flex flex-col space-y-1.5">
+              <Label>Email</Label>
+              <div className="flex items-center gap-2 rounded-md border p-2">
+                <Mail className="h-4 w-4 text-muted-foreground" />
+                <span>{providerData.email}</span>
+              </div>
+            </div>
+            <div className="flex flex-col space-y-1.5">
+              <Label>Phone</Label>
+              <div className="flex items-center gap-2 rounded-md border p-2">
+                <Phone className="h-4 w-4 text-muted-foreground" />
+                <span>{providerData.phone}</span>
+              </div>
+            </div>
+            <div className="flex flex-col space-y-1.5">
+              <Label>Location</Label>
+              <div className="flex items-center gap-2 rounded-md border p-2">
+                <MapPin className="h-4 w-4 text-muted-foreground" />
+                <span>{providerData.location}</span>
+              </div>
+            </div>
+            <div className="flex flex-col space-y-1.5">
+              <Label>GST Number</Label>
+              <div className="flex items-center gap-2 rounded-md border p-2">
+                <FileText className="h-4 w-4 text-muted-foreground" />
+                <span>{providerData.gstNumber}</span>
+              </div>
+            </div>
+            <div className="flex flex-col space-y-1.5">
+              <Label>PAN Number</Label>
+              <div className="flex items-center gap-2 rounded-md border p-2">
+                <FileText className="h-4 w-4 text-muted-foreground" />
+                <span>{providerData.panNumber}</span>
+              </div>
+            </div>
           </CardContent>
         </Card>
+
+        {/* Account Information Card */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Revenue</CardTitle>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              className="h-4 w-4 text-muted-foreground"
-            >
-              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-            </svg>
+          <CardHeader className="pb-3">
+            <CardTitle>Account Information</CardTitle>
+            <CardDescription>Account status and administrative details</CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{providerData.revenue}</div>
-            <p className="text-xs text-muted-foreground">+$1,245.50 from last month</p>
+          <CardContent className="space-y-4">
+            <div className="flex flex-col space-y-1.5">
+              <Label>Join Date</Label>
+              <div className="flex items-center gap-2 rounded-md border p-2">
+                <Calendar className="h-4 w-4 text-muted-foreground" />
+                <span>{new Date(providerData.joinDate).toLocaleDateString()}</span>
+              </div>
+            </div>
+            <div className="flex flex-col space-y-1.5">
+              <Label>Account Status</Label>
+              <div className="flex items-center gap-2">
+                <div
+                  className={`flex items-center gap-2 rounded-md border p-2 ${
+                    providerData.status === "Active"
+                      ? "border-green-200 bg-green-50 text-green-700"
+                      : providerData.status === "Pending"
+                        ? "border-yellow-200 bg-yellow-50 text-yellow-700"
+                        : "border-red-200 bg-red-50 text-red-700"
+                  }`}
+                >
+                  {providerData.status === "Active" ? (
+                    <UserCheck className="h-4 w-4" />
+                  ) : providerData.status === "Pending" ? (
+                    <Clock className="h-4 w-4" />
+                  ) : (
+                    <UserX className="h-4 w-4" />
+                  )}
+                  <span>{providerData.status}</span>
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-col space-y-1.5">
+              <Label>Verification Status</Label>
+              <div className="flex items-center gap-2 rounded-md border p-2">
+                <Shield className="h-4 w-4 text-muted-foreground" />
+                <span>{providerData.verificationStatus}</span>
+              </div>
+            </div>
+            <div className="flex flex-col space-y-1.5">
+              <Label>Account Type</Label>
+              <div className="flex items-center gap-2 rounded-md border p-2">
+                <Store className="h-4 w-4 text-muted-foreground" />
+                <span>{providerData.accountType}</span>
+              </div>
+            </div>
+            <div className="flex flex-col space-y-1.5">
+              <Label>Last Login</Label>
+              <div className="flex items-center gap-2 rounded-md border p-2">
+                <Clock className="h-4 w-4 text-muted-foreground" />
+                <span>{providerData.lastLogin}</span>
+              </div>
+            </div>
+            <div className="flex flex-col space-y-1.5">
+              <Label>Total Orders</Label>
+              <div className="flex items-center gap-2 rounded-md border p-2">
+                <FileText className="h-4 w-4 text-muted-foreground" />
+                <span>{providerData.orders}</span>
+              </div>
+            </div>
+            <div className="flex flex-col space-y-1.5">
+              <Label>Rating</Label>
+              <div className="flex items-center gap-2 rounded-md border p-2">
+                <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                <span>{providerData.rating}/5</span>
+              </div>
+            </div>
+            <div className="flex flex-col space-y-1.5">
+              <Label>Total Revenue</Label>
+              <div className="flex items-center gap-2 rounded-md border p-2">
+                <FileText className="h-4 w-4 text-muted-foreground" />
+                <span>{providerData.revenue}</span>
+              </div>
+            </div>
           </CardContent>
         </Card>
+
+        {/* Administrative Actions Card */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Rating</CardTitle>
-            <Star className="h-4 w-4 text-muted-foreground" />
+          <CardHeader>
+            <CardTitle>Administrative Actions</CardTitle>
+            <CardDescription>Manage provider account settings</CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{providerData.rating}/5</div>
-            <p className="text-xs text-muted-foreground">Based on 156 reviews</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Status</CardTitle>
-            <Store className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{providerStatus}</div>
-            <p className="text-xs text-muted-foreground">
-              Since {new Date(providerData.joinDate).toLocaleDateString()}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Tabs defaultValue="profile" value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 lg:w-[400px]">
-          <TabsTrigger value="profile">Profile</TabsTrigger>
-          <TabsTrigger value="services">Services</TabsTrigger>
-          <TabsTrigger value="orders">Orders</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="profile" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Provider Information</CardTitle>
-              <CardDescription>View and manage provider details</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center gap-4">
-                <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Store className="h-10 w-10 text-primary" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-medium">{providerData.name}</h3>
-                  <div className="text-sm text-muted-foreground">
-                    Provider since {new Date(providerData.joinDate).toLocaleDateString()}
-                  </div>
-                  <div className="flex items-center mt-1">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <Star
-                        key={star}
-                        className={`h-4 w-4 ${
-                          star <= Math.floor(providerData.rating) ? "fill-yellow-500 text-yellow-500" : "text-gray-300"
-                        }`}
-                      />
-                    ))}
-                    <span className="ml-1 text-sm">{providerData.rating}/5</span>
-                  </div>
-                </div>
+          <CardContent className="space-y-4">
+            <div className="grid gap-4">
+              <div className="grid grid-cols-2 gap-4">
+                <Button
+                  onClick={() => handleStatusChange("Active")}
+                  variant="outline"
+                  className="border-green-200 bg-green-50 text-green-700 hover:bg-green-100"
+                >
+                  <UserCheck className="mr-2 h-4 w-4" />
+                  Activate Account
+                </Button>
+                <Button
+                  onClick={() => handleStatusChange("Pending")}
+                  variant="outline"
+                  className="border-yellow-200 bg-yellow-50 text-yellow-700 hover:bg-yellow-100"
+                >
+                  <Clock className="mr-2 h-4 w-4" />
+                  Set as Pending
+                </Button>
               </div>
-
-              <Separator />
-
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <Mail className="h-4 w-4 text-muted-foreground" />
-                  <p className="text-sm">{providerData.email}</p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Phone className="h-4 w-4 text-muted-foreground" />
-                  <p className="text-sm">{providerData.phone}</p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-muted-foreground" />
-                  <p className="text-sm">{providerData.address}</p>
-                </div>
-              </div>
-
-              <Separator />
-
-              <div className="space-y-2">
-                <h4 className="font-medium">Description</h4>
-                <p className="text-sm">{providerData.description}</p>
-              </div>
-
-              <Separator />
-
-              <div className="space-y-2">
-                <h4 className="font-medium">Account Status</h4>
-                <div className="flex items-center gap-2">
-                  <span
-                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
-                    ${providerStatus === "Active" ? "bg-green-100 text-green-800" : ""}
-                    ${providerStatus === "Pending" ? "bg-yellow-100 text-yellow-800" : ""}
-                    ${providerStatus === "Suspended" ? "bg-red-100 text-red-800" : ""}
-                  `}
-                  >
-                    {providerStatus}
-                  </span>
-                  <p className="text-sm text-muted-foreground">Last updated: Today</p>
-                </div>
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button variant="outline" className="w-full" onClick={() => setIsEditDialogOpen(true)}>
-                <Edit className="mr-2 h-4 w-4" />
-                Edit Profile
-              </Button>
-            </CardFooter>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="services" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Services Offered</CardTitle>
-              <CardDescription>View and manage services offered by this provider</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="rounded-md border">
-                <div className="grid grid-cols-4 p-3 text-sm font-medium">
-                  <div>Service</div>
-                  <div>Price</div>
-                  <div>Turnaround Time</div>
-                  <div className="text-right">Actions</div>
-                </div>
-                <Separator />
-                {providerData.services.map((service) => (
-                  <div key={service.id} className="grid grid-cols-4 p-3 text-sm items-center">
-                    <div className="font-medium">{service.name}</div>
-                    <div>{service.price}</div>
-                    <div>{service.turnaround}</div>
-                    <div className="flex justify-end gap-2">
-                      <Button variant="outline" size="sm">
-                        Edit
-                      </Button>
-                      <Button variant="outline" size="sm" className="text-destructive">
-                        Remove
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button variant="outline" className="w-full">
-                Add New Service
-              </Button>
-            </CardFooter>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="orders" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Orders</CardTitle>
-              <CardDescription>View recent orders processed by this provider</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="rounded-md border">
-                <div className="grid grid-cols-6 p-3 text-sm font-medium">
-                  <div>Order ID</div>
-                  <div>Customer</div>
-                  <div>Date</div>
-                  <div>Service</div>
-                  <div>Amount</div>
-                  <div>Status</div>
-                </div>
-                <Separator />
-                {providerData.recentOrders.map((order) => (
-                  <div key={order.id} className="grid grid-cols-6 p-3 text-sm items-center">
-                    <div className="font-medium">#{order.id}</div>
-                    <div>{order.customer}</div>
-                    <div>{order.date}</div>
-                    <div>{order.service}</div>
-                    <div>{order.amount}</div>
-                    <div>
-                      <span
-                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
-                        ${order.status === "Pending" ? "bg-orange-100 text-orange-800" : ""}
-                        ${order.status === "Processing" ? "bg-yellow-100 text-yellow-800" : ""}
-                        ${order.status === "Ready" ? "bg-blue-100 text-blue-800" : ""}
-                        ${order.status === "Delivered" ? "bg-green-100 text-green-800" : ""}
-                      `}
-                      >
-                        {order.status}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-            <CardFooter>
               <Button
+                onClick={() => handleStatusChange("Suspended")}
                 variant="outline"
-                className="w-full"
-                onClick={() => router.push(`/dashboard/admin/orders?provider=${providerData.id}`)}
+                className="border-red-200 bg-red-50 text-red-700 hover:bg-red-100"
               >
-                View All Orders
+                <UserX className="mr-2 h-4 w-4" />
+                Suspend Account
               </Button>
+              <Button onClick={handleResetPassword} variant="outline">
+                <Lock className="mr-2 h-4 w-4" />
+                Reset Password
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Administrative Notes Card */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle>Administrative Notes</CardTitle>
+              <Button variant="outline" size="sm" onClick={() => setIsEditingNotes(!isEditingNotes)}>
+                <Edit className="mr-2 h-4 w-4" />
+                {isEditingNotes ? "Cancel" : "Edit Notes"}
+              </Button>
+            </div>
+            <CardDescription>Internal notes about this provider</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {isEditingNotes ? (
+              <Textarea value={adminNotes} onChange={(e) => setAdminNotes(e.target.value)} className="min-h-[150px]" />
+            ) : (
+              <div className="rounded-md border p-3">{adminNotes}</div>
+            )}
+          </CardContent>
+          {isEditingNotes && (
+            <CardFooter>
+              <Button onClick={handleSaveNotes}>Save Notes</Button>
             </CardFooter>
-          </Card>
-        </TabsContent>
-      </Tabs>
+          )}
+        </Card>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Business Address</CardTitle>
+          <CardDescription>Provider location information</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="rounded-lg border p-4">
+            <div className="mb-2 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="font-medium">Business Address</span>
+                {providerData.address.isVerified && (
+                  <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+                    Verified
+                  </span>
+                )}
+              </div>
+            </div>
+            <div className="text-sm text-muted-foreground">
+              <p>{providerData.address.street}</p>
+              <p>
+                {providerData.address.city}, {providerData.address.state} {providerData.address.postalCode}
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Services Offered</CardTitle>
+          <CardDescription>Services provided by this laundry service provider</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {providerData.services.map((service) => (
+              <div key={service.id} className="flex items-center justify-between rounded-lg border p-4">
+                <div>
+                  <p className="font-medium">{service.name}</p>
+                  <p className="text-sm text-muted-foreground">Service ID: {service.id}</p>
+                </div>
+                <div className="text-right">
+                  <p className="font-medium">{service.price}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Account Activity</CardTitle>
+          <CardDescription>Recent account activity and login history</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {providerData.activityLog.map((activity, index) => (
+              <div key={index} className="flex items-start gap-4 rounded-lg border p-4">
+                <div className="rounded-full bg-primary/10 p-2">
+                  <Clock className="h-4 w-4 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                    <p className="font-medium">{activity.action}</p>
+                    <p className="text-sm text-muted-foreground">{activity.date}</p>
+                  </div>
+                  <p className="text-sm text-muted-foreground">IP: {activity.ip}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }
