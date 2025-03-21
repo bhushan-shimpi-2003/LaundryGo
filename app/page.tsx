@@ -196,7 +196,7 @@ export default function Home() {
                 </p>
               </div>
               <div className="mt-4 flex items-baseline text-5xl font-bold">
-                10
+                9
                 <span className="ml-1 text-base font-medium text-muted-foreground">
                   /Piece
                 </span>
@@ -230,7 +230,7 @@ export default function Home() {
                 </p>
               </div>
               <div className="mt-4 flex items-baseline text-5xl font-bold">
-                1499
+                1199
                 <span className="ml-1 text-base font-medium text-muted-foreground">
                   /month
                 </span>
@@ -273,7 +273,7 @@ export default function Home() {
               <ul className="mt-6 space-y-2">
                 <li className="flex items-center gap-2">
                   <CheckCircle className="h-4 w-4 text-primary" />
-                  <span>Unlimited weight</span>
+                  <span>Up to 25kg of laundry</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle className="h-4 w-4 text-primary" />
@@ -364,9 +364,9 @@ export default function Home() {
                   className="rounded-full"
                 />
                 <div>
-                  <p className="font-medium">Michael Brown</p>
+                  <p className="font-medium">Vedant Shinde</p>
                   <p className="text-sm text-muted-foreground">
-                    Los Angeles, CA
+                    Parandwadi, Pune
                   </p>
                 </div>
               </div>
