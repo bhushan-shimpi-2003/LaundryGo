@@ -8,6 +8,9 @@ import { usePathname } from "next/navigation"
 import {
   BarChart3,
   ClipboardList,
+  CreditCard,
+  FileText,
+  Gift,
   Home,
   LayoutDashboard,
   LogOut,
@@ -18,6 +21,9 @@ import {
   Truck,
   User,
   Users,
+  Bell,
+  Shield,
+  Activity,
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -115,7 +121,7 @@ const adminNavItems: NavItem[] = [
   {
     title: "Orders",
     href: "/dashboard/admin/orders",
-    icon: <Package className="h-5 w-5" />,
+    icon: <ShoppingCart className="h-5 w-5" />,
   },
   {
     title: "Schedule Pickup",
@@ -123,9 +129,39 @@ const adminNavItems: NavItem[] = [
     icon: <Truck className="h-5 w-5" />,
   },
   {
+    title: "Payments",
+    href: "/dashboard/admin/payments",
+    icon: <CreditCard className="h-5 w-5" />,
+  },
+  {
+    title: "Promotions",
+    href: "/dashboard/admin/promotions",
+    icon: <Gift className="h-5 w-5" />,
+  },
+  {
     title: "Reports",
     href: "/dashboard/admin/reports",
+    icon: <FileText className="h-5 w-5" />,
+  },
+  {
+    title: "Analytics",
+    href: "/dashboard/admin/analytics",
     icon: <BarChart3 className="h-5 w-5" />,
+  },
+  {
+    title: "Users",
+    href: "/dashboard/admin/users",
+    icon: <Shield className="h-5 w-5" />,
+  },
+  {
+    title: "Activity Logs",
+    href: "/dashboard/admin/activity-logs",
+    icon: <Activity className="h-5 w-5" />,
+  },
+  {
+    title: "Notifications",
+    href: "/dashboard/admin/notifications",
+    icon: <Bell className="h-5 w-5" />,
   },
   {
     title: "Settings",
