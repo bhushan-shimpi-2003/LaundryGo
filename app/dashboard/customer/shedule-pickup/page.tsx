@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, CalendarIcon, Clock } from "lucide-react"
+import { ArrowLeft, Banknote, CalendarIcon, Clock, CreditCard } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
@@ -84,6 +84,22 @@ const savedAddresses = [
   },
 ]
 
+// Add this after the savedAddresses array
+const paymentMethods = [
+  {
+    id: "cod",
+    name: "Cash on Delivery",
+    description: "Pay in cash when your laundry is delivered",
+    icon: "cash",
+  },
+  {
+    id: "card",
+    name: "Credit/Debit Card",
+    description: "Pay securely with your card",
+    icon: "credit-card",
+  },
+]
+
 export default function SchedulePickupPage() {
   const router = useRouter()
   const { toast } = useToast()
@@ -96,6 +112,9 @@ export default function SchedulePickupPage() {
   const [selectedAddress, setSelectedAddress] = useState<string>("home")
   const [useNewAddress, setUseNewAddress] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  // Add this to the component state declarations
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>("cod")
+  const [showCardForm, setShowCardForm] = useState(false)
 
   const handleNext = () => {
     setStep(step + 1)
@@ -145,6 +164,16 @@ export default function SchedulePickupPage() {
       toast({
         title: "Missing information",
         description: "Please select an address.",
+        variant: "destructive",
+      })
+      setIsLoading(false)
+      return
+    }
+
+    if (!selectedPaymentMethod) {
+      toast({
+        title: "Missing information",
+        description: "Please select a payment method.",
         variant: "destructive",
       })
       setIsLoading(false)
@@ -421,6 +450,66 @@ export default function SchedulePickupPage() {
               )}
             </div>
 
+            {/* Add this before the Separator and Order Summary in step 3 */}
+            <div className="space-y-4 mt-6">
+              <h3 className="text-lg font-medium">Payment Method</h3>
+              <RadioGroup
+                value={selectedPaymentMethod}
+                onValueChange={(value) => {
+                  setSelectedPaymentMethod(value)
+                  setShowCardForm(value === "card")
+                }}
+              >
+                {paymentMethods.map((method) => (
+                  <div key={method.id} className="flex">
+                    <FormItem className="flex items-start space-x-3 space-y-0 rounded-md border p-4 w-full">
+                      <FormControl>
+                        <RadioGroupItem value={method.id} />
+                      </FormControl>
+                      <div className="flex-1 space-y-1">
+                        <div className="flex items-center">
+                          <FormLabel className="text-base font-medium">{method.name}</FormLabel>
+                          {method.icon === "cash" ? (
+                            <Banknote className="ml-2 h-4 w-4 text-muted-foreground" />
+                          ) : (
+                            <CreditCard className="ml-2 h-4 w-4 text-muted-foreground" />
+                          )}
+                        </div>
+                        <FormDescription className="text-sm text-muted-foreground">
+                          {method.description}
+                        </FormDescription>
+                      </div>
+                    </FormItem>
+                  </div>
+                ))}
+              </RadioGroup>
+
+              {showCardForm && (
+                <Card className="mt-4">
+                  <CardContent className="pt-6 space-y-4">
+                    <div className="space-y-2">
+                      <FormLabel>Card Number</FormLabel>
+                      <Input placeholder="1234 5678 9012 3456" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <FormLabel>Expiration Date</FormLabel>
+                        <Input placeholder="MM/YY" />
+                      </div>
+                      <div className="space-y-2">
+                        <FormLabel>CVC</FormLabel>
+                        <Input placeholder="123" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <FormLabel>Cardholder Name</FormLabel>
+                      <Input placeholder="Name as it appears on card" />
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+
             <Separator className="my-4" />
 
             <div className="space-y-2">
@@ -437,6 +526,11 @@ export default function SchedulePickupPage() {
                 <div className="flex justify-between">
                   <span className="font-medium">Pickup Time:</span>
                   <span>{selectedTimeSlot || "Not selected"}</span>
+                </div>
+                {/* Add this to the order summary, before the Separator */}
+                <div className="flex justify-between">
+                  <span className="font-medium">Payment Method:</span>
+                  <span>{paymentMethods.find((m) => m.id === selectedPaymentMethod)?.name || "Not selected"}</span>
                 </div>
                 <Separator />
                 <div className="flex justify-between text-lg font-medium">
