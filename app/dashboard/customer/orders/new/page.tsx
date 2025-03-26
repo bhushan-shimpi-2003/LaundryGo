@@ -1,404 +1,362 @@
 "use client"
 
-import { useState } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { CalendarIcon, Clock } from "lucide-react"
+import { ArrowRight, Calendar, Filter, Search, Banknote, CreditCard } from "lucide-react"
 
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Checkbox } from "@/components/ui/checkbox"
-import { FormControl, FormDescription, FormItem, FormLabel } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Separator } from "@/components/ui/separator"
-import { Textarea } from "@/components/ui/textarea"
-import { cn } from "@/lib/utils"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
-// Mock data for service types
-const serviceTypes = [
+// Mock orders data
+const orders = [
   {
-    id: "standard-wash",
-    name: "Standard Wash",
-    description: "Regular washing and drying service",
-    price: 9.99,
-    estimatedTime: "48 hours",
+    id: "ORD-12345",
+    date: "2023-12-14",
+    service: "Premium Wash",
+    status: "in-progress",
+    paymentStatus: "paid",
+    paymentMethod: "card",
+    total: 31.86,
   },
   {
-    id: "premium-wash",
-    name: "Premium Wash",
-    description: "Premium washing with fabric softener and special care",
-    price: 14.99,
-    estimatedTime: "48 hours",
+    id: "ORD-12344",
+    date: "2023-12-10",
+    service: "Standard Wash",
+    status: "delivered",
+    paymentStatus: "paid",
+    paymentMethod: "card",
+    total: 19.99,
   },
   {
-    id: "dry-cleaning",
-    name: "Dry Cleaning",
-    description: "Professional dry cleaning for delicate items",
-    price: 19.99,
-    estimatedTime: "72 hours",
+    id: "ORD-12343",
+    date: "2023-12-05",
+    service: "Dry Cleaning",
+    status: "delivered",
+    paymentStatus: "paid",
+    paymentMethod: "card",
+    total: 45.5,
   },
   {
-    id: "ironing",
-    name: "Ironing Service",
-    description: "Professional ironing for your clothes",
-    price: 7.99,
-    estimatedTime: "24 hours",
+    id: "ORD-12342",
+    date: "2023-11-28",
+    service: "Wash & Iron",
+    status: "delivered",
+    paymentStatus: "paid",
+    paymentMethod: "card",
+    total: 27.75,
   },
   {
-    id: "wash-iron",
-    name: "Wash & Iron",
-    description: "Complete washing and ironing service",
-    price: 16.99,
-    estimatedTime: "72 hours",
-  },
-]
-
-// Mock data for time slots
-const timeSlots = [
-  "8:00 AM - 10:00 AM",
-  "10:00 AM - 12:00 PM",
-  "12:00 PM - 2:00 PM",
-  "2:00 PM - 4:00 PM",
-  "4:00 PM - 6:00 PM",
-  "6:00 PM - 8:00 PM",
-]
-
-// Mock data for saved addresses
-const savedAddresses = [
-  {
-    id: "home",
-    name: "Home",
-    address: "123 Main St, Apt 4B, New York, NY 10001",
-    isDefault: true,
-  },
-  {
-    id: "work",
-    name: "Work",
-    address: "456 Business Ave, Suite 200, New York, NY 10002",
-    isDefault: false,
+    id: "ORD-12341",
+    date: "2023-11-20",
+    service: "Standard Wash",
+    status: "delivered",
+    paymentStatus: "paid",
+    paymentMethod: "cod",
+    total: 18.5,
   },
 ]
 
-export default function NewOrderPage() {
-  const router = useRouter()
-  const [step, setStep] = useState(1)
-  const [date, setDate] = useState<Date>()
-  const [selectedService, setSelectedService] = useState<string>("")
-  const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>("")
-  const [selectedAddress, setSelectedAddress] = useState<string>("home")
-  const [useNewAddress, setUseNewAddress] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-
-  const handleNext = () => {
-    setStep(step + 1)
-    window.scrollTo(0, 0)
+// Helper function to get status badge variant
+function getStatusBadgeVariant(status) {
+  switch (status) {
+    case "pending":
+      return "outline"
+    case "scheduled":
+      return "secondary"
+    case "picked-up":
+      return "default"
+    case "in-progress":
+      return "default"
+    case "ready":
+      return "success"
+    case "delivered":
+      return "success"
+    case "cancelled":
+      return "destructive"
+    default:
+      return "outline"
   }
+}
 
-  const handleBack = () => {
-    setStep(step - 1)
-    window.scrollTo(0, 0)
+// Helper function to get payment status badge variant
+function getPaymentStatusBadgeVariant(status) {
+  switch (status) {
+    case "paid":
+      return "success"
+    case "pending":
+      return "warning"
+    case "failed":
+      return "destructive"
+    default:
+      return "outline"
   }
+}
 
-  const handleSubmit = () => {
-    setIsLoading(true)
-
-    // Simulate order creation
-    setTimeout(() => {
-      setIsLoading(false)
-      router.push("/dashboard/customer/orders")
-    }, 1500)
-  }
-
+export default function OrdersPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold tracking-tight">Schedule Pickup</h2>
-        <p className="text-muted-foreground">Create a new laundry service order</p>
+        <h2 className="text-2xl font-bold tracking-tight">My Orders</h2>
+        <p className="text-muted-foreground">View and track your laundry orders</p>
       </div>
 
-      <div className="flex items-center space-x-2">
-        <div
-          className={cn(
-            "flex h-8 w-8 items-center justify-center rounded-full border text-xs font-medium",
-            step >= 1
-              ? "border-primary bg-primary text-primary-foreground"
-              : "border-muted-foreground text-muted-foreground",
-          )}
-        >
-          1
+      <div className="flex flex-col sm:flex-row gap-4 items-end">
+        <div className="grid gap-2 flex-1">
+          <Input
+            placeholder="Search orders..."
+            className="w-full"
+            prefix={<Search className="h-4 w-4 text-muted-foreground" />}
+          />
         </div>
-        <div className={cn("h-0.5 w-10", step >= 2 ? "bg-primary" : "bg-muted-foreground")} />
-        <div
-          className={cn(
-            "flex h-8 w-8 items-center justify-center rounded-full border text-xs font-medium",
-            step >= 2
-              ? "border-primary bg-primary text-primary-foreground"
-              : "border-muted-foreground text-muted-foreground",
-          )}
-        >
-          2
+        <div className="grid gap-2 w-full sm:w-auto">
+          <Select defaultValue="all">
+            <SelectTrigger className="w-full sm:w-[180px]">
+              <Filter className="mr-2 h-4 w-4" />
+              <SelectValue placeholder="Filter" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Orders</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="in-progress">In Progress</SelectItem>
+              <SelectItem value="delivered">Delivered</SelectItem>
+              <SelectItem value="cancelled">Cancelled</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-        <div className={cn("h-0.5 w-10", step >= 3 ? "bg-primary" : "bg-muted-foreground")} />
-        <div
-          className={cn(
-            "flex h-8 w-8 items-center justify-center rounded-full border text-xs font-medium",
-            step >= 3
-              ? "border-primary bg-primary text-primary-foreground"
-              : "border-muted-foreground text-muted-foreground",
-          )}
-        >
-          3
-        </div>
+        <Button asChild>
+          <Link href="/dashboard/customer/schedule-pickup">Schedule Pickup</Link>
+        </Button>
       </div>
 
-      {step === 1 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Select Service</CardTitle>
-            <CardDescription>Choose the type of laundry service you need</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <RadioGroup value={selectedService} onValueChange={setSelectedService}>
-              {serviceTypes.map((service) => (
-                <div key={service.id} className="flex">
-                  <FormItem className="flex items-start space-x-3 space-y-0 rounded-md border p-4 w-full">
-                    <FormControl>
-                      <RadioGroupItem value={service.id} />
-                    </FormControl>
-                    <div className="flex-1 space-y-1">
-                      <div className="flex items-center justify-between">
-                        <FormLabel className="text-base font-medium">{service.name}</FormLabel>
-                        <span className="text-base font-medium">${service.price.toFixed(2)}</span>
-                      </div>
-                      <FormDescription className="text-sm text-muted-foreground">{service.description}</FormDescription>
-                      <div className="flex items-center text-xs text-muted-foreground mt-2">
-                        <Clock className="mr-1 h-3 w-3" />
-                        Estimated turnaround: {service.estimatedTime}
+      <Tabs defaultValue="all" className="w-full">
+        <TabsList className="grid grid-cols-4 w-full md:w-auto">
+          <TabsTrigger value="all">All</TabsTrigger>
+          <TabsTrigger value="active">Active</TabsTrigger>
+          <TabsTrigger value="completed">Completed</TabsTrigger>
+          <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
+        </TabsList>
+        <TabsContent value="all" className="space-y-4 mt-4">
+          {orders.map((order) => (
+            <Card key={order.id}>
+              <CardHeader className="pb-2">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <CardTitle className="text-base">Order #{order.id}</CardTitle>
+                    <CardDescription className="flex items-center mt-1">
+                      <Calendar className="mr-1 h-3.5 w-3.5" />
+                      {order.date}
+                    </CardDescription>
+                  </div>
+                  <Badge variant={getStatusBadgeVariant(order.status)}>
+                    {order.status === "in-progress" ? "In Progress" : order.status}
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="pb-2">
+                <div className="grid gap-2">
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-muted-foreground">Service:</span>
+                    <span className="font-medium">{order.service}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-muted-foreground">Payment:</span>
+                    <div className="flex items-center">
+                      {order.paymentMethod === "card" ? (
+                        <CreditCard className="mr-1 h-3.5 w-3.5" />
+                      ) : (
+                        <Banknote className="mr-1 h-3.5 w-3.5" />
+                      )}
+                      <Badge variant={getPaymentStatusBadgeVariant(order.paymentStatus)} className="ml-2">
+                        {order.paymentStatus}
+                      </Badge>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-muted-foreground">Total:</span>
+                    <span className="font-medium">${order.total.toFixed(2)}</span>
+                  </div>
+                </div>
+              </CardContent>
+              <CardFooter>
+                <Button variant="outline" asChild className="w-full">
+                  <Link href={`/dashboard/customer/orders/${order.id}`}>
+                    View Details
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+              </CardFooter>
+            </Card>
+          ))}
+        </TabsContent>
+        <TabsContent value="active" className="space-y-4 mt-4">
+          {orders
+            .filter((order) => ["pending", "scheduled", "picked-up", "in-progress", "ready"].includes(order.status))
+            .map((order) => (
+              <Card key={order.id}>
+                <CardHeader className="pb-2">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <CardTitle className="text-base">Order #{order.id}</CardTitle>
+                      <CardDescription className="flex items-center mt-1">
+                        <Calendar className="mr-1 h-3.5 w-3.5" />
+                        {order.date}
+                      </CardDescription>
+                    </div>
+                    <Badge variant={getStatusBadgeVariant(order.status)}>
+                      {order.status === "in-progress" ? "In Progress" : order.status}
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="pb-2">
+                  <div className="grid gap-2">
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-muted-foreground">Service:</span>
+                      <span className="font-medium">{order.service}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-muted-foreground">Payment:</span>
+                      <div className="flex items-center">
+                        {order.paymentMethod === "card" ? (
+                          <CreditCard className="mr-1 h-3.5 w-3.5" />
+                        ) : (
+                          <Banknote className="mr-1 h-3.5 w-3.5" />
+                        )}
+                        <Badge variant={getPaymentStatusBadgeVariant(order.paymentStatus)} className="ml-2">
+                          {order.paymentStatus}
+                        </Badge>
                       </div>
                     </div>
-                  </FormItem>
-                </div>
-              ))}
-            </RadioGroup>
-
-            <div className="space-y-2">
-              <FormLabel>Special Instructions (Optional)</FormLabel>
-              <Textarea placeholder="Any special instructions for handling your laundry..." className="min-h-[100px]" />
-            </div>
-          </CardContent>
-          <CardFooter className="flex justify-between">
-            <Link href="/dashboard/customer/orders">
-              <Button variant="outline">Cancel</Button>
-            </Link>
-            <Button onClick={handleNext} disabled={!selectedService}>
-              Next
-            </Button>
-          </CardFooter>
-        </Card>
-      )}
-
-      {step === 2 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Schedule Pickup</CardTitle>
-            <CardDescription>Choose when you want your laundry to be picked up</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <FormLabel>Pickup Date</FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn("w-full justify-start text-left font-normal", !date && "text-muted-foreground")}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {date ? date.toLocaleDateString() : "Select date"}
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-muted-foreground">Total:</span>
+                      <span className="font-medium">${order.total.toFixed(2)}</span>
+                    </div>
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Button variant="outline" asChild className="w-full">
+                    <Link href={`/dashboard/customer/orders/${order.id}`}>
+                      View Details
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
                   </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={date}
-                    onSelect={setDate}
-                    initialFocus
-                    disabled={(date) => {
-                      // Disable dates in the past
-                      const today = new Date()
-                      today.setHours(0, 0, 0, 0)
-                      return date < today
-                    }}
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-
-            <div className="space-y-2">
-              <FormLabel>Pickup Time</FormLabel>
-              <Select value={selectedTimeSlot} onValueChange={setSelectedTimeSlot}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select time slot" />
-                </SelectTrigger>
-                <SelectContent>
-                  {timeSlots.map((slot) => (
-                    <SelectItem key={slot} value={slot}>
-                      {slot}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </CardContent>
-          <CardFooter className="flex justify-between">
-            <Button variant="outline" onClick={handleBack}>
-              Back
-            </Button>
-            <Button onClick={handleNext} disabled={!date || !selectedTimeSlot}>
-              Next
-            </Button>
-          </CardFooter>
-        </Card>
-      )}
-
-      {step === 3 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Pickup Address</CardTitle>
-            <CardDescription>Where should we pick up your laundry?</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-4">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="use-new-address"
-                  checked={useNewAddress}
-                  onCheckedChange={(checked) => {
-                    if (checked) {
-                      setUseNewAddress(true)
-                    } else {
-                      setUseNewAddress(false)
-                    }
-                  }}
-                />
-                <label
-                  htmlFor="use-new-address"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  Use a new address
-                </label>
-              </div>
-
-              {!useNewAddress ? (
-                <RadioGroup value={selectedAddress} onValueChange={setSelectedAddress}>
-                  {savedAddresses.map((address) => (
-                    <div key={address.id} className="flex">
-                      <FormItem className="flex items-start space-x-3 space-y-0 rounded-md border p-4 w-full">
-                        <FormControl>
-                          <RadioGroupItem value={address.id} />
-                        </FormControl>
-                        <div className="flex-1 space-y-1">
-                          <div className="flex items-center">
-                            <FormLabel className="text-base font-medium">{address.name}</FormLabel>
-                            {address.isDefault && (
-                              <span className="ml-2 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-                                Default
-                              </span>
-                            )}
-                          </div>
-                          <FormDescription className="text-sm text-muted-foreground">{address.address}</FormDescription>
-                        </div>
-                      </FormItem>
+                </CardFooter>
+              </Card>
+            ))}
+        </TabsContent>
+        <TabsContent value="completed" className="space-y-4 mt-4">
+          {orders
+            .filter((order) => order.status === "delivered")
+            .map((order) => (
+              <Card key={order.id}>
+                <CardHeader className="pb-2">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <CardTitle className="text-base">Order #{order.id}</CardTitle>
+                      <CardDescription className="flex items-center mt-1">
+                        <Calendar className="mr-1 h-3.5 w-3.5" />
+                        {order.date}
+                      </CardDescription>
                     </div>
-                  ))}
-                </RadioGroup>
-              ) : (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <FormLabel>Address Name</FormLabel>
-                      <Input placeholder="e.g., Home, Work, etc." />
+                    <Badge variant={getStatusBadgeVariant(order.status)}>
+                      {order.status === "in-progress" ? "In Progress" : order.status}
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="pb-2">
+                  <div className="grid gap-2">
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-muted-foreground">Service:</span>
+                      <span className="font-medium">{order.service}</span>
                     </div>
-                    <div className="space-y-2">
-                      <FormLabel>Phone Number</FormLabel>
-                      <Input type="tel" placeholder="Your contact number" />
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-muted-foreground">Payment:</span>
+                      <div className="flex items-center">
+                        {order.paymentMethod === "card" ? (
+                          <CreditCard className="mr-1 h-3.5 w-3.5" />
+                        ) : (
+                          <Banknote className="mr-1 h-3.5 w-3.5" />
+                        )}
+                        <Badge variant={getPaymentStatusBadgeVariant(order.paymentStatus)} className="ml-2">
+                          {order.paymentStatus}
+                        </Badge>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-muted-foreground">Total:</span>
+                      <span className="font-medium">${order.total.toFixed(2)}</span>
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <FormLabel>Street Address</FormLabel>
-                    <Input placeholder="Street address" />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <FormLabel>City</FormLabel>
-                      <Input placeholder="City" />
+                </CardContent>
+                <CardFooter>
+                  <Button variant="outline" asChild className="w-full">
+                    <Link href={`/dashboard/customer/orders/${order.id}`}>
+                      View Details
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))}
+        </TabsContent>
+        <TabsContent value="cancelled" className="space-y-4 mt-4">
+          {orders
+            .filter((order) => order.status === "cancelled")
+            .map((order) => (
+              <Card key={order.id}>
+                <CardHeader className="pb-2">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <CardTitle className="text-base">Order #{order.id}</CardTitle>
+                      <CardDescription className="flex items-center mt-1">
+                        <Calendar className="mr-1 h-3.5 w-3.5" />
+                        {order.date}
+                      </CardDescription>
                     </div>
-                    <div className="space-y-2">
-                      <FormLabel>State</FormLabel>
-                      <Input placeholder="State" />
+                    <Badge variant={getStatusBadgeVariant(order.status)}>
+                      {order.status === "in-progress" ? "In Progress" : order.status}
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="pb-2">
+                  <div className="grid gap-2">
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-muted-foreground">Service:</span>
+                      <span className="font-medium">{order.service}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-muted-foreground">Payment:</span>
+                      <div className="flex items-center">
+                        {order.paymentMethod === "card" ? (
+                          <CreditCard className="mr-1 h-3.5 w-3.5" />
+                        ) : (
+                          <Banknote className="mr-1 h-3.5 w-3.5" />
+                        )}
+                        <Badge variant={getPaymentStatusBadgeVariant(order.paymentStatus)} className="ml-2">
+                          {order.paymentStatus}
+                        </Badge>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-muted-foreground">Total:</span>
+                      <span className="font-medium">${order.total.toFixed(2)}</span>
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <FormLabel>Zip Code</FormLabel>
-                      <Input placeholder="Zip code" />
-                    </div>
-                    <div className="space-y-2">
-                      <FormLabel>Country</FormLabel>
-                      <Input placeholder="Country" defaultValue="United States" />
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox id="save-address" />
-                    <label
-                      htmlFor="save-address"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
-                      Save this address for future orders
-                    </label>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <Separator className="my-4" />
-
-            <div className="space-y-2">
-              <h3 className="text-lg font-medium">Order Summary</h3>
-              <div className="rounded-md border p-4 space-y-4">
-                <div className="flex justify-between">
-                  <span className="font-medium">Service:</span>
-                  <span>{serviceTypes.find((s) => s.id === selectedService)?.name || "Not selected"}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-medium">Pickup Date:</span>
-                  <span>{date ? date.toLocaleDateString() : "Not selected"}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-medium">Pickup Time:</span>
-                  <span>{selectedTimeSlot || "Not selected"}</span>
-                </div>
-                <Separator />
-                <div className="flex justify-between text-lg font-medium">
-                  <span>Total:</span>
-                  <span>${serviceTypes.find((s) => s.id === selectedService)?.price.toFixed(2) || "0.00"}</span>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-          <CardFooter className="flex justify-between">
-            <Button variant="outline" onClick={handleBack}>
-              Back
-            </Button>
-            <Button onClick={handleSubmit} disabled={isLoading}>
-              {isLoading ? "Processing..." : "Schedule Pickup"}
-            </Button>
-          </CardFooter>
-        </Card>
-      )}
+                </CardContent>
+                <CardFooter>
+                  <Button variant="outline" asChild className="w-full">
+                    <Link href={`/dashboard/customer/orders/${order.id}`}>
+                      View Details
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))}
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }

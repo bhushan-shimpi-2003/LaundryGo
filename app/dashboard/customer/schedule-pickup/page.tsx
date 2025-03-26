@@ -3,8 +3,6 @@
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { loadStripe } from "@stripe/stripe-js"
-import { Elements, useStripe, useElements, CardElement } from "@stripe/react-stripe-js"
 import { ArrowLeft, Banknote, CalendarIcon, Clock, CreditCard, Loader2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -21,9 +19,6 @@ import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/components/ui/use-toast"
 import { cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
-
-// Initialize Stripe with your publishable key
-const stripePromise = loadStripe("pk_test_TYooMQauvdEDq54NiTphI7jx")
 
 // Mock data for service types
 const serviceTypes = [
@@ -106,99 +101,180 @@ const paymentMethods = [
   },
 ]
 
-// Stripe Card Element styling
-const cardElementOptions = {
-  style: {
-    base: {
-      fontSize: "16px",
-      color: "#424770",
-      "::placeholder": {
-        color: "#aab7c4",
-      },
-    },
-    invalid: {
-      color: "#9e2146",
-    },
-  },
-}
-
-// CheckoutForm component for Stripe integration
-function CheckoutForm({ amount, onPaymentSuccess, onPaymentError }) {
-  const stripe = useStripe()
-  const elements = useElements()
+// Custom Card Form Component
+function CustomCardForm({ onPaymentSuccess, onPaymentError, amount }) {
   const [isProcessing, setIsProcessing] = useState(false)
-  const [paymentError, setPaymentError] = useState(null)
+  const [cardDetails, setCardDetails] = useState({
+    cardNumber: "",
+    expiryDate: "",
+    cvc: "",
+    cardholderName: "",
+  })
+  const [errors, setErrors] = useState({})
   const { toast } = useToast()
 
-  const handleSubmit = async (event) => {
-    event.preventDefault()
+  const validateCardDetails = () => {
+    const newErrors = {}
+    let isValid = true
 
-    if (!stripe || !elements) {
-      // Stripe.js has not loaded yet
+    if (!cardDetails.cardNumber.trim()) {
+      newErrors.cardNumber = "Card number is required"
+      isValid = false
+    } else if (!/^\d{16}$/.test(cardDetails.cardNumber.replace(/\s/g, ""))) {
+      newErrors.cardNumber = "Card number must be 16 digits"
+      isValid = false
+    }
+
+    if (!cardDetails.expiryDate.trim()) {
+      newErrors.expiryDate = "Expiry date is required"
+      isValid = false
+    } else if (!/^\d{2}\/\d{2}$/.test(cardDetails.expiryDate)) {
+      newErrors.expiryDate = "Expiry date must be in MM/YY format"
+      isValid = false
+    }
+
+    if (!cardDetails.cvc.trim()) {
+      newErrors.cvc = "CVC is required"
+      isValid = false
+    } else if (!/^\d{3,4}$/.test(cardDetails.cvc)) {
+      newErrors.cvc = "CVC must be 3 or 4 digits"
+      isValid = false
+    }
+
+    if (!cardDetails.cardholderName.trim()) {
+      newErrors.cardholderName = "Cardholder name is required"
+      isValid = false
+    }
+
+    setErrors(newErrors)
+    return isValid
+  }
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target
+
+    // Format card number with spaces
+    if (name === "cardNumber") {
+      const formattedValue = value
+        .replace(/\s/g, "")
+        .replace(/(\d{4})/g, "$1 ")
+        .trim()
+      setCardDetails({ ...cardDetails, [name]: formattedValue })
+    }
+    // Format expiry date with slash
+    else if (name === "expiryDate") {
+      let formattedValue = value.replace(/\D/g, "")
+      if (formattedValue.length > 2) {
+        formattedValue = `${formattedValue.slice(0, 2)}/${formattedValue.slice(2, 4)}`
+      }
+      setCardDetails({ ...cardDetails, [name]: formattedValue })
+    } else {
+      setCardDetails({ ...cardDetails, [name]: value })
+    }
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+
+    if (!validateCardDetails()) {
       return
     }
 
     setIsProcessing(true)
-    setPaymentError(null)
 
-    try {
-      // Create a payment method
-      const { error, paymentMethod } = await stripe.createPaymentMethod({
-        type: "card",
-        card: elements.getElement(CardElement),
-      })
+    // Simulate payment processing
+    setTimeout(() => {
+      // 90% chance of success for demo purposes
+      const isSuccess = Math.random() < 0.9
 
-      if (error) {
-        setPaymentError(error.message)
-        toast({
-          title: "Payment failed",
-          description: error.message,
-          variant: "destructive",
-        })
-        onPaymentError(error.message)
-      } else {
-        // In a real app, you would send the payment method ID to your server
-        // and create a payment intent. For this demo, we'll simulate success.
+      if (isSuccess) {
         toast({
           title: "Payment successful",
           description: `Payment of $${amount.toFixed(2)} processed successfully`,
         })
-        onPaymentSuccess(paymentMethod)
+        onPaymentSuccess({
+          id: `pm_${Math.random().toString(36).substring(2, 15)}`,
+          last4: cardDetails.cardNumber.slice(-4),
+          brand: "visa",
+        })
+      } else {
+        const errorMessage = "Your card was declined. Please try another payment method."
+        toast({
+          title: "Payment failed",
+          description: errorMessage,
+          variant: "destructive",
+        })
+        onPaymentError(errorMessage)
       }
-    } catch (err) {
-      setPaymentError(err.message)
-      toast({
-        title: "Payment failed",
-        description: err.message,
-        variant: "destructive",
-      })
-      onPaymentError(err.message)
-    } finally {
+
       setIsProcessing(false)
-    }
+    }, 2000)
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <FormLabel>Card Details</FormLabel>
-          <div className="border rounded-md p-3">
-            <CardElement options={cardElementOptions} />
-          </div>
-          {paymentError && <p className="text-sm text-red-500 mt-2">{paymentError}</p>}
-        </div>
-        <Button type="submit" disabled={!stripe || isProcessing} className="w-full">
-          {isProcessing ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Processing...
-            </>
-          ) : (
-            `Pay $${amount.toFixed(2)}`
-          )}
-        </Button>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="space-y-2">
+        <FormLabel htmlFor="cardNumber">Card Number</FormLabel>
+        <Input
+          id="cardNumber"
+          name="cardNumber"
+          placeholder="1234 5678 9012 3456"
+          value={cardDetails.cardNumber}
+          onChange={handleInputChange}
+          maxLength={19}
+        />
+        {errors.cardNumber && <p className="text-sm text-red-500">{errors.cardNumber}</p>}
       </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <FormLabel htmlFor="expiryDate">Expiry Date</FormLabel>
+          <Input
+            id="expiryDate"
+            name="expiryDate"
+            placeholder="MM/YY"
+            value={cardDetails.expiryDate}
+            onChange={handleInputChange}
+            maxLength={5}
+          />
+          {errors.expiryDate && <p className="text-sm text-red-500">{errors.expiryDate}</p>}
+        </div>
+        <div className="space-y-2">
+          <FormLabel htmlFor="cvc">CVC</FormLabel>
+          <Input
+            id="cvc"
+            name="cvc"
+            placeholder="123"
+            value={cardDetails.cvc}
+            onChange={handleInputChange}
+            maxLength={4}
+          />
+          {errors.cvc && <p className="text-sm text-red-500">{errors.cvc}</p>}
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <FormLabel htmlFor="cardholderName">Cardholder Name</FormLabel>
+        <Input
+          id="cardholderName"
+          name="cardholderName"
+          placeholder="Name as it appears on card"
+          value={cardDetails.cardholderName}
+          onChange={handleInputChange}
+        />
+        {errors.cardholderName && <p className="text-sm text-red-500">{errors.cardholderName}</p>}
+      </div>
+
+      <Button type="submit" disabled={isProcessing} className="w-full">
+        {isProcessing ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Processing...
+          </>
+        ) : (
+          `Pay $${amount.toFixed(2)}`
+        )}
+      </Button>
     </form>
   )
 }
@@ -229,6 +305,7 @@ export default function SchedulePickupPage() {
   const [specialInstructions, setSpecialInstructions] = useState("")
   const [saveAddress, setSaveAddress] = useState(false)
   const [errors, setErrors] = useState({})
+  const [paymentInfo, setPaymentInfo] = useState(null)
 
   // Get the price of the selected service
   const selectedServicePrice = serviceTypes.find((s) => s.id === selectedService)?.price || 0
@@ -312,6 +389,7 @@ export default function SchedulePickupPage() {
 
   const handlePaymentSuccess = (paymentMethod) => {
     setPaymentStatus("success")
+    setPaymentInfo(paymentMethod)
     handleSubmit()
   }
 
@@ -335,6 +413,7 @@ export default function SchedulePickupPage() {
     // If payment method is card and payment hasn't been processed yet
     if (selectedPaymentMethod === "card" && paymentStatus === "pending") {
       // The payment form will handle this case
+      setIsLoading(false)
       return
     }
 
@@ -358,6 +437,7 @@ export default function SchedulePickupPage() {
         specialInstructions,
         status: "pending",
         createdAt: new Date().toISOString(),
+        paymentInfo: paymentInfo,
       }
 
       // In a real app, you would save this to your database
@@ -715,13 +795,11 @@ export default function SchedulePickupPage() {
               {selectedPaymentMethod === "card" && (
                 <Card className="mt-4">
                   <CardContent className="pt-6">
-                    <Elements stripe={stripePromise}>
-                      <CheckoutForm
-                        amount={selectedServicePrice}
-                        onPaymentSuccess={handlePaymentSuccess}
-                        onPaymentError={handlePaymentError}
-                      />
-                    </Elements>
+                    <CustomCardForm
+                      amount={selectedServicePrice}
+                      onPaymentSuccess={handlePaymentSuccess}
+                      onPaymentError={handlePaymentError}
+                    />
                   </CardContent>
                 </Card>
               )}
