@@ -402,6 +402,3 @@ export default function NewOrderPage() {
     </div>
   )
 }
-
-sfklfks
-skfnsdnf
