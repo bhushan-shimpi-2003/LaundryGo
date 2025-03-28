@@ -1,5 +1,7 @@
+"use client"
+
 import Link from "next/link"
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Plus } from "lucide-react"
+import { ArrowUpDown, ChevronDown, MoreHorizontal, Plus, Banknote, CreditCard } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -15,8 +17,19 @@ import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 
+// Define types for the order data
+interface Order {
+  id: string
+  date: string
+  service: string
+  amount: number
+  status: string
+  paymentMethod: "cod" | "card"
+  paymentStatus: "pending" | "paid" | "failed"
+}
+
 // Mock data for orders
-const orders = [
+const orders: Order[] = [
   {
     id: "ORD-1234",
     date: "Mar 14, 2023",
@@ -144,7 +157,17 @@ export default function CustomerOrders() {
                   <TableCell>
                     <div className="flex flex-col gap-1">
                       <span className="text-xs text-muted-foreground">
-                        {order.paymentMethod === "cod" ? "Cash on Delivery" : "Card"}
+                        {order.paymentMethod === "cod" ? (
+                          <div className="flex items-center">
+                            <Banknote className="mr-1 h-3 w-3" />
+                            <span>Cash on Delivery</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center">
+                            <CreditCard className="mr-1 h-3 w-3" />
+                            <span>Card</span>
+                          </div>
+                        )}
                       </span>
                       <Badge
                         variant={

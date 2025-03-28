@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -101,20 +103,37 @@ const paymentMethods = [
   },
 ]
 
+interface CardDetails {
+  cardNumber: string
+  expiryDate: string
+  cvc: string
+  cardholderName: string
+}
+
+interface CardFormProps {
+  onPaymentSuccess: (paymentMethod: any) => void
+  onPaymentError: (errorMessage: string) => void
+  amount: number
+}
+
+interface FormErrors {
+  [key: string]: string
+}
+
 // Custom Card Form Component
-function CustomCardForm({ onPaymentSuccess, onPaymentError, amount }) {
+function CustomCardForm({ onPaymentSuccess, onPaymentError, amount }: CardFormProps) {
   const [isProcessing, setIsProcessing] = useState(false)
-  const [cardDetails, setCardDetails] = useState({
+  const [cardDetails, setCardDetails] = useState<CardDetails>({
     cardNumber: "",
     expiryDate: "",
     cvc: "",
     cardholderName: "",
   })
-  const [errors, setErrors] = useState({})
+  const [errors, setErrors] = useState<FormErrors>({})
   const { toast } = useToast()
 
-  const validateCardDetails = () => {
-    const newErrors = {}
+  const validateCardDetails = (): boolean => {
+    const newErrors: FormErrors = {}
     let isValid = true
 
     if (!cardDetails.cardNumber.trim()) {
@@ -150,7 +169,7 @@ function CustomCardForm({ onPaymentSuccess, onPaymentError, amount }) {
     return isValid
   }
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
 
     // Format card number with spaces
@@ -173,7 +192,7 @@ function CustomCardForm({ onPaymentSuccess, onPaymentError, amount }) {
     }
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
     if (!validateCardDetails()) {
@@ -279,6 +298,22 @@ function CustomCardForm({ onPaymentSuccess, onPaymentError, amount }) {
   )
 }
 
+interface NewAddress {
+  name: string
+  phone: string
+  street: string
+  city: string
+  state: string
+  zipCode: string
+  country: string
+}
+
+interface PaymentInfo {
+  id: string
+  last4: string
+  brand: string
+}
+
 export default function SchedulePickupPage() {
   const router = useRouter()
   const { toast } = useToast()
@@ -293,7 +328,7 @@ export default function SchedulePickupPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>("cod")
   const [paymentStatus, setPaymentStatus] = useState<"pending" | "success" | "failed">("pending")
-  const [newAddress, setNewAddress] = useState({
+  const [newAddress, setNewAddress] = useState<NewAddress>({
     name: "",
     phone: "",
     street: "",
@@ -304,14 +339,14 @@ export default function SchedulePickupPage() {
   })
   const [specialInstructions, setSpecialInstructions] = useState("")
   const [saveAddress, setSaveAddress] = useState(false)
-  const [errors, setErrors] = useState({})
-  const [paymentInfo, setPaymentInfo] = useState(null)
+  const [errors, setErrors] = useState<FormErrors>({})
+  const [paymentInfo, setPaymentInfo] = useState<PaymentInfo | null>(null)
 
   // Get the price of the selected service
   const selectedServicePrice = serviceTypes.find((s) => s.id === selectedService)?.price || 0
 
-  const validateStep = (currentStep) => {
-    const stepErrors = {}
+  const validateStep = (currentStep: number): boolean => {
+    const stepErrors: FormErrors = {}
     let isValid = true
 
     if (currentStep === 1) {
@@ -387,13 +422,13 @@ export default function SchedulePickupPage() {
     window.scrollTo(0, 0)
   }
 
-  const handlePaymentSuccess = (paymentMethod) => {
+  const handlePaymentSuccess = (paymentMethod: PaymentInfo) => {
     setPaymentStatus("success")
     setPaymentInfo(paymentMethod)
     handleSubmit()
   }
 
-  const handlePaymentError = (errorMessage) => {
+  const handlePaymentError = (errorMessage: string) => {
     setPaymentStatus("failed")
     setIsLoading(false)
   }
