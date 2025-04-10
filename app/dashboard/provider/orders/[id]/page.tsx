@@ -25,7 +25,7 @@ const orderData = {
   status: "Processing",
   service: "Standard Wash",
   weight: "5 kg",
-  amount: "$24.99",
+  amount: "₹24.99",
   paymentMethod: "Visa ending in 4242",
   paymentStatus: "Paid",
   specialInstructions: "Please handle with care. There are some delicate items.",
@@ -64,10 +64,10 @@ const orderData = {
     },
   ],
   items: [
-    { name: "T-shirts", quantity: 3, price: "$9.00" },
-    { name: "Pants", quantity: 2, price: "$8.00" },
-    { name: "Shirts", quantity: 2, price: "$6.00" },
-    { name: "Socks (pairs)", quantity: 4, price: "$2.00" },
+    { name: "T-shirts", quantity: 3, price: "₹9.00" },
+    { name: "Pants", quantity: 2, price: "₹8.00" },
+    { name: "Shirts", quantity: 2, price: "₹6.00" },
+    { name: "Socks (pairs)", quantity: 4, price: "₹2.00" },
   ],
   address: {
     type: "Home",
@@ -337,7 +337,7 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
                   <div className="grid grid-cols-4 p-3 text-sm">
                     <div>#1233</div>
                     <div>Mar 10, 2023</div>
-                    <div>$34.99</div>
+                    <div>₹34.99</div>
                     <div>
                       <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
                         Delivered
@@ -347,7 +347,7 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
                   <div className="grid grid-cols-4 p-3 text-sm">
                     <div>#1232</div>
                     <div>Mar 5, 2023</div>
-                    <div>$19.99</div>
+                    <div>₹19.99</div>
                     <div>
                       <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
                         Delivered
