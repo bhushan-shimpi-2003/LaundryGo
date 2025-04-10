@@ -9,8 +9,8 @@ import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
-import { FormControl, FormDescription, FormItem, FormLabel } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -93,6 +93,7 @@ export default function NewOrderPage() {
   const [useNewAddress, setUseNewAddress] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState<string>("cash")
+  const [specialInstructions, setSpecialInstructions] = useState("")
 
   const handleNext = () => {
     setStep(step + 1)
@@ -166,31 +167,34 @@ export default function NewOrderPage() {
             <RadioGroup value={selectedService} onValueChange={setSelectedService}>
               {serviceTypes.map((service) => (
                 <div key={service.id} className="flex">
-                  <FormItem className="flex items-start space-x-3 space-y-0 rounded-md border p-4 w-full hover:border-orange-300 hover:bg-orange-50 transition-all duration-200">
-                    <FormControl>
-                      <RadioGroupItem value={service.id} />
-                    </FormControl>
+                  <div className="flex items-start space-x-3 space-y-0 rounded-md border p-4 w-full hover:border-orange-300 hover:bg-orange-50 transition-all duration-200">
+                    <RadioGroupItem value={service.id} id={service.id} />
                     <div className="flex-1 space-y-1">
                       <div className="flex items-center justify-between">
-                        <FormLabel className="text-base font-medium">{service.name}</FormLabel>
+                        <Label htmlFor={service.id} className="text-base font-medium">
+                          {service.name}
+                        </Label>
                         <span className="text-base font-medium">₹{service.price.toFixed(2)}</span>
                       </div>
-                      <FormDescription className="text-sm text-muted-foreground">{service.description}</FormDescription>
+                      <p className="text-sm text-muted-foreground">{service.description}</p>
                       <div className="flex items-center text-xs text-muted-foreground mt-2">
                         <Clock className="mr-1 h-3 w-3" />
                         Estimated turnaround: {service.estimatedTime}
                       </div>
                     </div>
-                  </FormItem>
+                  </div>
                 </div>
               ))}
             </RadioGroup>
 
             <div className="space-y-2">
-              <FormLabel>Special Instructions (Optional)</FormLabel>
+              <Label htmlFor="special-instructions">Special Instructions (Optional)</Label>
               <Textarea
+                id="special-instructions"
                 placeholder="Any special instructions for handling your laundry..."
                 className="min-h-[100px] focus:border-orange-300 focus:ring-orange-200"
+                value={specialInstructions}
+                onChange={(e) => setSpecialInstructions(e.target.value)}
               />
             </div>
           </CardContent>
@@ -219,10 +223,11 @@ export default function NewOrderPage() {
           </CardHeader>
           <CardContent className="space-y-4 p-6">
             <div className="space-y-2">
-              <FormLabel>Pickup Date</FormLabel>
+              <Label htmlFor="pickup-date">Pickup Date</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
+                    id="pickup-date"
                     variant="outline"
                     className={cn(
                       "w-full justify-start text-left font-normal border-green-200 hover:border-green-300 hover:bg-green-50",
@@ -252,9 +257,12 @@ export default function NewOrderPage() {
             </div>
 
             <div className="space-y-2">
-              <FormLabel>Pickup Time</FormLabel>
+              <Label htmlFor="pickup-time">Pickup Time</Label>
               <Select value={selectedTimeSlot} onValueChange={setSelectedTimeSlot}>
-                <SelectTrigger className="border-green-200 focus:ring-green-200 hover:border-green-300">
+                <SelectTrigger
+                  id="pickup-time"
+                  className="border-green-200 focus:ring-green-200 hover:border-green-300"
+                >
                   <SelectValue placeholder="Select time slot" />
                 </SelectTrigger>
                 <SelectContent>
@@ -307,34 +315,34 @@ export default function NewOrderPage() {
                   }}
                   className="border-blue-300 text-blue-600 focus:ring-blue-200"
                 />
-                <label
+                <Label
                   htmlFor="use-new-address"
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
                   Use a new address
-                </label>
+                </Label>
               </div>
 
               {!useNewAddress ? (
                 <RadioGroup value={selectedAddress} onValueChange={setSelectedAddress}>
                   {savedAddresses.map((address) => (
                     <div key={address.id} className="flex">
-                      <FormItem className="flex items-start space-x-3 space-y-0 rounded-md border p-4 w-full hover:border-blue-300 hover:bg-blue-50 transition-all duration-200">
-                        <FormControl>
-                          <RadioGroupItem value={address.id} className="border-blue-300 text-blue-600" />
-                        </FormControl>
+                      <div className="flex items-start space-x-3 space-y-0 rounded-md border p-4 w-full hover:border-blue-300 hover:bg-blue-50 transition-all duration-200">
+                        <RadioGroupItem value={address.id} id={address.id} className="border-blue-300 text-blue-600" />
                         <div className="flex-1 space-y-1">
                           <div className="flex items-center">
-                            <FormLabel className="text-base font-medium">{address.name}</FormLabel>
+                            <Label htmlFor={address.id} className="text-base font-medium">
+                              {address.name}
+                            </Label>
                             {address.isDefault && (
                               <span className="ml-2 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-600">
                                 Default
                               </span>
                             )}
                           </div>
-                          <FormDescription className="text-sm text-muted-foreground">{address.address}</FormDescription>
+                          <p className="text-sm text-muted-foreground">{address.address}</p>
                         </div>
-                      </FormItem>
+                      </div>
                     </div>
                   ))}
                 </RadioGroup>
@@ -342,15 +350,17 @@ export default function NewOrderPage() {
                 <div className="space-y-4 p-4 border rounded-md border-blue-200 bg-blue-50">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <FormLabel>Address Name</FormLabel>
+                      <Label htmlFor="address-name">Address Name</Label>
                       <Input
+                        id="address-name"
                         placeholder="e.g., Home, Work, etc."
                         className="border-blue-200 focus:border-blue-300 focus:ring-blue-200"
                       />
                     </div>
                     <div className="space-y-2">
-                      <FormLabel>Phone Number</FormLabel>
+                      <Label htmlFor="phone-number">Phone Number</Label>
                       <Input
+                        id="phone-number"
                         type="tel"
                         placeholder="Your contact number"
                         className="border-blue-200 focus:border-blue-300 focus:ring-blue-200"
@@ -358,20 +368,26 @@ export default function NewOrderPage() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <FormLabel>Street Address</FormLabel>
+                    <Label htmlFor="street-address">Street Address</Label>
                     <Input
+                      id="street-address"
                       placeholder="Street address"
                       className="border-blue-200 focus:border-blue-300 focus:ring-blue-200"
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <FormLabel>City</FormLabel>
-                      <Input placeholder="City" className="border-blue-200 focus:border-blue-300 focus:ring-blue-200" />
+                      <Label htmlFor="city">City</Label>
+                      <Input
+                        id="city"
+                        placeholder="City"
+                        className="border-blue-200 focus:border-blue-300 focus:ring-blue-200"
+                      />
                     </div>
                     <div className="space-y-2">
-                      <FormLabel>State</FormLabel>
+                      <Label htmlFor="state">State</Label>
                       <Input
+                        id="state"
                         placeholder="State"
                         className="border-blue-200 focus:border-blue-300 focus:ring-blue-200"
                       />
@@ -379,15 +395,17 @@ export default function NewOrderPage() {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <FormLabel>Zip Code</FormLabel>
+                      <Label htmlFor="zip-code">Zip Code</Label>
                       <Input
+                        id="zip-code"
                         placeholder="Zip code"
                         className="border-blue-200 focus:border-blue-300 focus:ring-blue-200"
                       />
                     </div>
                     <div className="space-y-2">
-                      <FormLabel>Country</FormLabel>
+                      <Label htmlFor="country">Country</Label>
                       <Input
+                        id="country"
                         placeholder="Country"
                         defaultValue="India"
                         className="border-blue-200 focus:border-blue-300 focus:ring-blue-200"
@@ -396,12 +414,12 @@ export default function NewOrderPage() {
                   </div>
                   <div className="flex items-center space-x-2">
                     <Checkbox id="save-address" className="border-blue-300 text-blue-600 focus:ring-blue-200" />
-                    <label
+                    <Label
                       htmlFor="save-address"
                       className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                     >
                       Save this address for future orders
-                    </label>
+                    </Label>
                   </div>
                 </div>
               )}
@@ -412,28 +430,26 @@ export default function NewOrderPage() {
             <div className="space-y-4">
               <h3 className="text-lg font-medium text-blue-800">Payment Method</h3>
               <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod} className="space-y-3">
-                <FormItem className="flex items-start space-x-3 space-y-0 rounded-md border p-4 hover:border-blue-300 hover:bg-blue-50 transition-all duration-200">
-                  <FormControl>
-                    <RadioGroupItem value="cash" className="border-blue-300 text-blue-600" />
-                  </FormControl>
+                <div className="flex items-start space-x-3 space-y-0 rounded-md border p-4 hover:border-blue-300 hover:bg-blue-50 transition-all duration-200">
+                  <RadioGroupItem value="cash" id="cash" className="border-blue-300 text-blue-600" />
                   <div className="flex-1 space-y-1">
-                    <FormLabel className="text-base font-medium">Cash on Delivery</FormLabel>
-                    <FormDescription className="text-sm text-muted-foreground">
-                      Pay with cash when your laundry is picked up
-                    </FormDescription>
+                    <Label htmlFor="cash" className="text-base font-medium">
+                      Cash on Delivery
+                    </Label>
+                    <p className="text-sm text-muted-foreground">Pay with cash when your laundry is picked up</p>
                   </div>
-                </FormItem>
-                <FormItem className="flex items-start space-x-3 space-y-0 rounded-md border p-4 hover:border-blue-300 hover:bg-blue-50 transition-all duration-200">
-                  <FormControl>
-                    <RadioGroupItem value="online" className="border-blue-300 text-blue-600" />
-                  </FormControl>
+                </div>
+                <div className="flex items-start space-x-3 space-y-0 rounded-md border p-4 hover:border-blue-300 hover:bg-blue-50 transition-all duration-200">
+                  <RadioGroupItem value="online" id="online" className="border-blue-300 text-blue-600" />
                   <div className="flex-1 space-y-1">
-                    <FormLabel className="text-base font-medium">Online Payment</FormLabel>
-                    <FormDescription className="text-sm text-muted-foreground">
+                    <Label htmlFor="online" className="text-base font-medium">
+                      Online Payment
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
                       Pay now using UPI, credit/debit card, or net banking
-                    </FormDescription>
+                    </p>
                   </div>
-                </FormItem>
+                </div>
               </RadioGroup>
             </div>
 
