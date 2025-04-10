@@ -10,11 +10,8 @@ import { ArrowLeft, Banknote, CalendarIcon, Clock, CreditCard, Loader2 } from "l
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Checkbox } from "@/components/ui/checkbox"
-import { FormControl, FormDescription, FormItem, FormLabel } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
@@ -22,41 +19,41 @@ import { useToast } from "@/components/ui/use-toast"
 import { cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 
-// Mock data for service types
+// Mock data for service types with Indian Rupee prices
 const serviceTypes = [
   {
     id: "standard-wash",
     name: "Standard Wash",
     description: "Regular washing and drying service",
-    price: 9.99,
+    price: 249,
     estimatedTime: "48 hours",
   },
   {
     id: "premium-wash",
     name: "Premium Wash",
     description: "Premium washing with fabric softener and special care",
-    price: 14.99,
+    price: 399,
     estimatedTime: "48 hours",
   },
   {
     id: "dry-cleaning",
     name: "Dry Cleaning",
     description: "Professional dry cleaning for delicate items",
-    price: 19.99,
+    price: 599,
     estimatedTime: "72 hours",
   },
   {
     id: "ironing",
     name: "Ironing Service",
     description: "Professional ironing for your clothes",
-    price: 7.99,
+    price: 199,
     estimatedTime: "24 hours",
   },
   {
     id: "wash-iron",
     name: "Wash & Iron",
     description: "Complete washing and ironing service",
-    price: 16.99,
+    price: 449,
     estimatedTime: "72 hours",
   },
 ]
@@ -76,13 +73,13 @@ const savedAddresses = [
   {
     id: "home",
     name: "Home",
-    address: "123 Main St, Apt 4B, New York, NY 10001",
+    address: "123 Main St, Apt 4B, Mumbai, MH 400001",
     isDefault: true,
   },
   {
     id: "work",
     name: "Work",
-    address: "456 Business Ave, Suite 200, New York, NY 10002",
+    address: "456 Business Ave, Suite 200, Bangalore, KA 560001",
     isDefault: false,
   },
 ]
@@ -99,6 +96,12 @@ const paymentMethods = [
     id: "card",
     name: "Credit/Debit Card",
     description: "Pay securely with your card",
+    icon: "credit-card",
+  },
+  {
+    id: "upi",
+    name: "UPI Payment",
+    description: "Pay using UPI apps like Google Pay, PhonePe, or Paytm",
     icon: "credit-card",
   },
 ]
@@ -209,7 +212,7 @@ function CustomCardForm({ onPaymentSuccess, onPaymentError, amount }: CardFormPr
       if (isSuccess) {
         toast({
           title: "Payment successful",
-          description: `Payment of $${amount.toFixed(2)} processed successfully`,
+          description: `Payment of ₹${amount.toFixed(2)} processed successfully`,
         })
         onPaymentSuccess({
           id: `pm_${Math.random().toString(36).substring(2, 15)}`,
@@ -233,7 +236,9 @@ function CustomCardForm({ onPaymentSuccess, onPaymentError, amount }: CardFormPr
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <FormLabel htmlFor="cardNumber">Card Number</FormLabel>
+        <label htmlFor="cardNumber" className="text-sm font-medium">
+          Card Number
+        </label>
         <Input
           id="cardNumber"
           name="cardNumber"
@@ -247,7 +252,9 @@ function CustomCardForm({ onPaymentSuccess, onPaymentError, amount }: CardFormPr
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <FormLabel htmlFor="expiryDate">Expiry Date</FormLabel>
+          <label htmlFor="expiryDate" className="text-sm font-medium">
+            Expiry Date
+          </label>
           <Input
             id="expiryDate"
             name="expiryDate"
@@ -259,7 +266,9 @@ function CustomCardForm({ onPaymentSuccess, onPaymentError, amount }: CardFormPr
           {errors.expiryDate && <p className="text-sm text-red-500">{errors.expiryDate}</p>}
         </div>
         <div className="space-y-2">
-          <FormLabel htmlFor="cvc">CVC</FormLabel>
+          <label htmlFor="cvc" className="text-sm font-medium">
+            CVC
+          </label>
           <Input
             id="cvc"
             name="cvc"
@@ -273,7 +282,9 @@ function CustomCardForm({ onPaymentSuccess, onPaymentError, amount }: CardFormPr
       </div>
 
       <div className="space-y-2">
-        <FormLabel htmlFor="cardholderName">Cardholder Name</FormLabel>
+        <label htmlFor="cardholderName" className="text-sm font-medium">
+          Cardholder Name
+        </label>
         <Input
           id="cardholderName"
           name="cardholderName"
@@ -291,7 +302,7 @@ function CustomCardForm({ onPaymentSuccess, onPaymentError, amount }: CardFormPr
             Processing...
           </>
         ) : (
-          `Pay $${amount.toFixed(2)}`
+          `Pay ₹${amount.toFixed(2)}`
         )}
       </Button>
     </form>
@@ -335,7 +346,7 @@ export default function SchedulePickupPage() {
     city: "",
     state: "",
     zipCode: "",
-    country: "United States",
+    country: "India",
   })
   const [specialInstructions, setSpecialInstructions] = useState("")
   const [saveAddress, setSaveAddress] = useState(false)
@@ -545,33 +556,44 @@ export default function SchedulePickupPage() {
             <CardDescription>Choose the type of laundry service you need</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <RadioGroup value={selectedService} onValueChange={setSelectedService}>
+            <div className="space-y-4">
               {serviceTypes.map((service) => (
                 <div key={service.id} className="flex">
-                  <FormItem className="flex items-start space-x-3 space-y-0 rounded-md border p-4 w-full">
-                    <FormControl>
-                      <RadioGroupItem value={service.id} />
-                    </FormControl>
+                  <div className="flex items-start space-x-3 space-y-0 rounded-md border p-4 w-full">
+                    <input
+                      type="radio"
+                      id={service.id}
+                      name="service"
+                      value={service.id}
+                      checked={selectedService === service.id}
+                      onChange={() => setSelectedService(service.id)}
+                      className="h-4 w-4 mt-1 border-gray-300 text-primary focus:ring-primary"
+                    />
                     <div className="flex-1 space-y-1">
                       <div className="flex items-center justify-between">
-                        <FormLabel className="text-base font-medium">{service.name}</FormLabel>
-                        <span className="text-base font-medium">${service.price.toFixed(2)}</span>
+                        <label htmlFor={service.id} className="text-base font-medium cursor-pointer">
+                          {service.name}
+                        </label>
+                        <span className="text-base font-medium">₹{service.price.toFixed(2)}</span>
                       </div>
-                      <FormDescription className="text-sm text-muted-foreground">{service.description}</FormDescription>
+                      <p className="text-sm text-muted-foreground">{service.description}</p>
                       <div className="flex items-center text-xs text-muted-foreground mt-2">
                         <Clock className="mr-1 h-3 w-3" />
                         Estimated turnaround: {service.estimatedTime}
                       </div>
                     </div>
-                  </FormItem>
+                  </div>
                 </div>
               ))}
-            </RadioGroup>
+            </div>
             {errors.service && <p className="text-sm text-red-500">{errors.service}</p>}
 
             <div className="space-y-2">
-              <FormLabel>Special Instructions (Optional)</FormLabel>
+              <label htmlFor="specialInstructions" className="text-sm font-medium">
+                Special Instructions (Optional)
+              </label>
               <Textarea
+                id="specialInstructions"
                 placeholder="Any special instructions for handling your laundry..."
                 className="min-h-[100px]"
                 value={specialInstructions}
@@ -596,10 +618,13 @@ export default function SchedulePickupPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <FormLabel>Pickup Date</FormLabel>
+              <label htmlFor="pickupDate" className="text-sm font-medium">
+                Pickup Date
+              </label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
+                    id="pickupDate"
                     variant="outline"
                     className={cn("w-full justify-start text-left font-normal", !date && "text-muted-foreground")}
                   >
@@ -626,9 +651,11 @@ export default function SchedulePickupPage() {
             </div>
 
             <div className="space-y-2">
-              <FormLabel>Pickup Time</FormLabel>
+              <label htmlFor="timeSlot" className="text-sm font-medium">
+                Pickup Time
+              </label>
               <Select value={selectedTimeSlot} onValueChange={setSelectedTimeSlot}>
-                <SelectTrigger>
+                <SelectTrigger id="timeSlot">
                   <SelectValue placeholder="Select time slot" />
                 </SelectTrigger>
                 <SelectContent>
@@ -660,16 +687,12 @@ export default function SchedulePickupPage() {
           <CardContent className="space-y-4">
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
-                <Checkbox
+                <input
+                  type="checkbox"
                   id="use-new-address"
                   checked={useNewAddress}
-                  onCheckedChange={(checked) => {
-                    if (checked) {
-                      setUseNewAddress(true)
-                    } else {
-                      setUseNewAddress(false)
-                    }
-                  }}
+                  onChange={(e) => setUseNewAddress(e.target.checked)}
+                  className="h-4 w-4 border-gray-300 rounded text-primary focus:ring-primary"
                 />
                 <label
                   htmlFor="use-new-address"
@@ -680,34 +703,45 @@ export default function SchedulePickupPage() {
               </div>
 
               {!useNewAddress ? (
-                <RadioGroup value={selectedAddress} onValueChange={setSelectedAddress}>
+                <div className="space-y-4">
                   {savedAddresses.map((address) => (
                     <div key={address.id} className="flex">
-                      <FormItem className="flex items-start space-x-3 space-y-0 rounded-md border p-4 w-full">
-                        <FormControl>
-                          <RadioGroupItem value={address.id} />
-                        </FormControl>
+                      <div className="flex items-start space-x-3 space-y-0 rounded-md border p-4 w-full">
+                        <input
+                          type="radio"
+                          id={address.id}
+                          name="address"
+                          value={address.id}
+                          checked={selectedAddress === address.id}
+                          onChange={() => setSelectedAddress(address.id)}
+                          className="h-4 w-4 mt-1 border-gray-300 text-primary focus:ring-primary"
+                        />
                         <div className="flex-1 space-y-1">
                           <div className="flex items-center">
-                            <FormLabel className="text-base font-medium">{address.name}</FormLabel>
+                            <label htmlFor={address.id} className="text-base font-medium cursor-pointer">
+                              {address.name}
+                            </label>
                             {address.isDefault && (
                               <span className="ml-2 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
                                 Default
                               </span>
                             )}
                           </div>
-                          <FormDescription className="text-sm text-muted-foreground">{address.address}</FormDescription>
+                          <p className="text-sm text-muted-foreground">{address.address}</p>
                         </div>
-                      </FormItem>
+                      </div>
                     </div>
                   ))}
-                </RadioGroup>
+                </div>
               ) : (
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <FormLabel>Address Name</FormLabel>
+                      <label htmlFor="addressName" className="text-sm font-medium">
+                        Address Name
+                      </label>
                       <Input
+                        id="addressName"
                         placeholder="e.g., Home, Work, etc."
                         value={newAddress.name}
                         onChange={(e) => setNewAddress({ ...newAddress, name: e.target.value })}
@@ -715,8 +749,11 @@ export default function SchedulePickupPage() {
                       {errors.addressName && <p className="text-sm text-red-500">{errors.addressName}</p>}
                     </div>
                     <div className="space-y-2">
-                      <FormLabel>Phone Number</FormLabel>
+                      <label htmlFor="phone" className="text-sm font-medium">
+                        Phone Number
+                      </label>
                       <Input
+                        id="phone"
                         type="tel"
                         placeholder="Your contact number"
                         value={newAddress.phone}
@@ -726,8 +763,11 @@ export default function SchedulePickupPage() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <FormLabel>Street Address</FormLabel>
+                    <label htmlFor="street" className="text-sm font-medium">
+                      Street Address
+                    </label>
                     <Input
+                      id="street"
                       placeholder="Street address"
                       value={newAddress.street}
                       onChange={(e) => setNewAddress({ ...newAddress, street: e.target.value })}
@@ -736,8 +776,11 @@ export default function SchedulePickupPage() {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <FormLabel>City</FormLabel>
+                      <label htmlFor="city" className="text-sm font-medium">
+                        City
+                      </label>
                       <Input
+                        id="city"
                         placeholder="City"
                         value={newAddress.city}
                         onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })}
@@ -745,8 +788,11 @@ export default function SchedulePickupPage() {
                       {errors.city && <p className="text-sm text-red-500">{errors.city}</p>}
                     </div>
                     <div className="space-y-2">
-                      <FormLabel>State</FormLabel>
+                      <label htmlFor="state" className="text-sm font-medium">
+                        State
+                      </label>
                       <Input
+                        id="state"
                         placeholder="State"
                         value={newAddress.state}
                         onChange={(e) => setNewAddress({ ...newAddress, state: e.target.value })}
@@ -756,29 +802,37 @@ export default function SchedulePickupPage() {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <FormLabel>Zip Code</FormLabel>
+                      <label htmlFor="zipCode" className="text-sm font-medium">
+                        PIN Code
+                      </label>
                       <Input
-                        placeholder="Zip code"
+                        id="zipCode"
+                        placeholder="PIN code"
                         value={newAddress.zipCode}
                         onChange={(e) => setNewAddress({ ...newAddress, zipCode: e.target.value })}
                       />
                       {errors.zipCode && <p className="text-sm text-red-500">{errors.zipCode}</p>}
                     </div>
                     <div className="space-y-2">
-                      <FormLabel>Country</FormLabel>
+                      <label htmlFor="country" className="text-sm font-medium">
+                        Country
+                      </label>
                       <Input
+                        id="country"
                         placeholder="Country"
-                        defaultValue="United States"
+                        defaultValue="India"
                         value={newAddress.country}
                         onChange={(e) => setNewAddress({ ...newAddress, country: e.target.value })}
                       />
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Checkbox
+                    <input
+                      type="checkbox"
                       id="save-address"
                       checked={saveAddress}
-                      onCheckedChange={(checked) => setSaveAddress(!!checked)}
+                      onChange={(e) => setSaveAddress(e.target.checked)}
+                      className="h-4 w-4 border-gray-300 rounded text-primary focus:ring-primary"
                     />
                     <label
                       htmlFor="save-address"
@@ -794,37 +848,39 @@ export default function SchedulePickupPage() {
 
             <div className="space-y-4 mt-6">
               <h3 className="text-lg font-medium">Payment Method</h3>
-              <RadioGroup
-                value={selectedPaymentMethod}
-                onValueChange={(value) => {
-                  setSelectedPaymentMethod(value)
-                  // Reset payment status when changing payment method
-                  setPaymentStatus("pending")
-                }}
-              >
+              <div className="space-y-4">
                 {paymentMethods.map((method) => (
                   <div key={method.id} className="flex">
-                    <FormItem className="flex items-start space-x-3 space-y-0 rounded-md border p-4 w-full">
-                      <FormControl>
-                        <RadioGroupItem value={method.id} />
-                      </FormControl>
+                    <div className="flex items-start space-x-3 space-y-0 rounded-md border p-4 w-full">
+                      <input
+                        type="radio"
+                        id={method.id}
+                        name="paymentMethod"
+                        value={method.id}
+                        checked={selectedPaymentMethod === method.id}
+                        onChange={() => {
+                          setSelectedPaymentMethod(method.id)
+                          setPaymentStatus("pending")
+                        }}
+                        className="h-4 w-4 mt-1 border-gray-300 text-primary focus:ring-primary"
+                      />
                       <div className="flex-1 space-y-1">
                         <div className="flex items-center">
-                          <FormLabel className="text-base font-medium">{method.name}</FormLabel>
+                          <label htmlFor={method.id} className="text-base font-medium cursor-pointer">
+                            {method.name}
+                          </label>
                           {method.icon === "cash" ? (
                             <Banknote className="ml-2 h-4 w-4 text-muted-foreground" />
                           ) : (
                             <CreditCard className="ml-2 h-4 w-4 text-muted-foreground" />
                           )}
                         </div>
-                        <FormDescription className="text-sm text-muted-foreground">
-                          {method.description}
-                        </FormDescription>
+                        <p className="text-sm text-muted-foreground">{method.description}</p>
                       </div>
-                    </FormItem>
+                    </div>
                   </div>
                 ))}
-              </RadioGroup>
+              </div>
               {errors.paymentMethod && <p className="text-sm text-red-500">{errors.paymentMethod}</p>}
 
               {selectedPaymentMethod === "card" && (
@@ -853,7 +909,7 @@ export default function SchedulePickupPage() {
                     </div>
                     <div className="ml-3">
                       <p className="text-sm font-medium text-green-800">
-                        Payment successful! Your card has been charged ${selectedServicePrice.toFixed(2)}.
+                        Payment successful! Your card has been charged ₹{selectedServicePrice.toFixed(2)}.
                       </p>
                     </div>
                   </div>
@@ -897,7 +953,7 @@ export default function SchedulePickupPage() {
                 <Separator />
                 <div className="flex justify-between text-lg font-medium">
                   <span>Total:</span>
-                  <span>${selectedServicePrice.toFixed(2)}</span>
+                  <span>₹{selectedServicePrice.toFixed(2)}</span>
                 </div>
               </div>
             </div>
@@ -925,4 +981,3 @@ export default function SchedulePickupPage() {
     </div>
   )
 }
-
