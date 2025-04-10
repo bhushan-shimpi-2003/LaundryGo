@@ -25,7 +25,7 @@ const orderData = {
   status: "Processing",
   service: "Standard Wash",
   weight: "5 kg",
-  amount: "$24.99",
+  amount: "₹24.99",
   paymentMethod: "Visa ending in 4242",
   paymentStatus: "Paid",
   specialInstructions: "Please handle with care. There are some delicate items.",
@@ -64,10 +64,10 @@ const orderData = {
     },
   ],
   items: [
-    { name: "T-shirts", quantity: 3, price: "$9.00" },
-    { name: "Pants", quantity: 2, price: "$8.00" },
-    { name: "Shirts", quantity: 2, price: "$6.00" },
-    { name: "Socks (pairs)", quantity: 4, price: "$2.00" },
+    { name: "T-shirts", quantity: 3, price: "₹9.00" },
+    { name: "Pants", quantity: 2, price: "₹8.00" },
+    { name: "Shirts", quantity: 2, price: "₹6.00" },
+    { name: "Socks (pairs)", quantity: 4, price: "₹2.00" },
   ],
   address: {
     type: "Home",

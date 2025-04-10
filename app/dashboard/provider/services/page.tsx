@@ -190,8 +190,8 @@ export default function ServicesPage() {
                 <CardContent className="space-y-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center text-sm">
-                      <DollarSign className="mr-1 h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">${service.price.toFixed(2)}</span>
+                      
+                      <span className="font-medium">₹{service.price.toFixed(2)}</span>
                     </div>
                     <div className="flex items-center text-sm">
                       <Clock className="mr-1 h-4 w-4 text-muted-foreground" />
@@ -253,7 +253,7 @@ export default function ServicesPage() {
                   <CardContent className="space-y-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center text-sm">
-                        <DollarSign className="mr-1 h-4 w-4 text-muted-foreground" />
+                        
                         <span className="font-medium">${service.price.toFixed(2)}</span>
                       </div>
                       <div className="flex items-center text-sm">
@@ -316,7 +316,7 @@ export default function ServicesPage() {
                   <CardContent className="space-y-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center text-sm">
-                        <DollarSign className="mr-1 h-4 w-4 text-muted-foreground" />
+                        
                         <span className="font-medium">${service.price.toFixed(2)}</span>
                       </div>
                       <div className="flex items-center text-sm">
@@ -379,7 +379,7 @@ export default function ServicesPage() {
                   <CardContent className="space-y-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center text-sm">
-                        <DollarSign className="mr-1 h-4 w-4 text-muted-foreground" />
+                        
                         <span className="font-medium">${service.price.toFixed(2)}</span>
                       </div>
                       <div className="flex items-center text-sm">
