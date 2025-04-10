@@ -7,76 +7,77 @@ import { ArrowLeft, Check, MapPin, Phone, Store, User } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/components/ui/use-toast"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
-
-// Form validation schema
-const providerFormSchema = z.object({
-  name: z.string().min(2, { message: "Provider name must be at least 2 characters." }),
-  email: z.string().email({ message: "Please enter a valid email address." }),
-  phone: z.string().min(10, { message: "Please enter a valid phone number." }),
-  address: z.string().min(5, { message: "Address must be at least 5 characters." }),
-  city: z.string().min(2, { message: "City must be at least 2 characters." }),
-  state: z.string().min(2, { message: "State must be at least 2 characters." }),
-  pinCode: z.string().min(6, { message: "PIN code must be at least 6 characters." }),
-  country: z.string().min(2, { message: "Country must be at least 2 characters." }),
-  description: z.string().optional(),
-  serviceArea: z.string().min(2, { message: "Service area must be at least 2 characters." }),
-  serviceTypes: z.string().min(2, { message: "Service types must be at least 2 characters." }),
-  commissionRate: z.string().min(1, { message: "Commission rate is required." }),
-  status: z.string(),
-  featured: z.boolean().default(false),
-  gstNumber: z.string().optional(),
-  panNumber: z.string().optional(),
-})
+import { Label } from "@/components/ui/label"
+import { Separator } from "@/components/ui/separator"
 
 export default function NewProviderPage() {
   const router = useRouter()
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  // Initialize form with react-hook-form
-  const form = useForm<z.infer<typeof providerFormSchema>>({
-    resolver: zodResolver(providerFormSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      phone: "",
-      address: "",
-      city: "",
-      state: "",
-      pinCode: "",
-      country: "India",
-      description: "",
-      serviceArea: "",
-      serviceTypes: "",
-      commissionRate: "10",
-      status: "Pending",
-      featured: false,
-      gstNumber: "",
-      panNumber: "",
-    },
+  // Form state
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    city: "",
+    state: "Maharashtra",
+    pinCode: "",
+    country: "India",
+    description: "",
+    serviceArea: "",
+    serviceTypes: "",
+    commissionRate: "10",
+    status: "Pending",
+    featured: false,
+    gstNumber: "",
+    panNumber: "",
   })
 
+  // Handle input changes
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
+  }
+
+  // Handle select changes
+  const handleSelectChange = (name, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
+  }
+
+  // Handle switch changes
+  const handleSwitchChange = (name, checked) => {
+    setFormData((prev) => ({
+      ...prev,
+      [name]: checked,
+    }))
+  }
+
   // Form submission handler
-  function onSubmit(values: z.infer<typeof providerFormSchema>) {
+  function handleSubmit(e) {
+    e.preventDefault()
     setIsSubmitting(true)
 
     // Simulate API call
     setTimeout(() => {
-      console.log(values)
+      console.log(formData)
       setIsSubmitting(false)
 
       toast({
         title: "Provider added successfully",
-        description: `${values.name} has been added to the platform.`,
+        description: `${formData.name} has been added to the platform.`,
       })
 
       router.push("/dashboard/admin/providers")
@@ -98,320 +99,272 @@ export default function NewProviderPage() {
         </div>
       </div>
 
-      <Card className="border-green-200">
-        <CardHeader className="bg-green-50 rounded-t-lg">
+      <Card className="border-green-200 shadow-lg">
+        <CardHeader className="bg-gradient-to-r from-green-50 to-green-100 rounded-t-lg">
           <CardTitle>Provider Information</CardTitle>
           <CardDescription>Enter the details of the new service provider</CardDescription>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <div className="space-y-6">
-                <div className="space-y-4">
-                  <h3 className="text-lg font-medium text-orange-700">Basic Information</h3>
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <FormField
-                      control={form.control}
-                      name="name"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Provider Name</FormLabel>
-                          <FormControl>
-                            <div className="relative">
-                              <Store className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                              <Input className="pl-9" placeholder="Enter business name" {...field} />
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Email Address</FormLabel>
-                          <FormControl>
-                            <div className="relative">
-                              <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                              <Input className="pl-9" placeholder="Enter email address" {...field} />
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="phone"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Phone Number</FormLabel>
-                          <FormControl>
-                            <div className="relative">
-                              <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                              <Input className="pl-9" placeholder="Enter phone number" {...field} />
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
+          <form onSubmit={handleSubmit} className="space-y-8">
+            <div className="space-y-6">
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium text-orange-700">Basic Information</h3>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <Label htmlFor="name">Provider Name</Label>
+                    <div className="relative mt-1">
+                      <Store className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="name"
+                        name="name"
+                        className="pl-9"
+                        placeholder="Enter business name"
+                        value={formData.name}
+                        onChange={handleChange}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label htmlFor="email">Email Address</Label>
+                    <div className="relative mt-1">
+                      <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="email"
+                        name="email"
+                        className="pl-9"
+                        placeholder="Enter email address"
+                        value={formData.email}
+                        onChange={handleChange}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label htmlFor="phone">Phone Number</Label>
+                    <div className="relative mt-1">
+                      <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="phone"
+                        name="phone"
+                        className="pl-9"
+                        placeholder="Enter phone number"
+                        value={formData.phone}
+                        onChange={handleChange}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label htmlFor="description">Business Description</Label>
+                    <Textarea
+                      id="description"
                       name="description"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Business Description</FormLabel>
-                          <FormControl>
-                            <Textarea
-                              placeholder="Brief description of the business"
-                              className="resize-none"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormDescription>A short description that will be displayed to customers</FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                      placeholder="Brief description of the business"
+                      className="resize-none mt-1"
+                      value={formData.description}
+                      onChange={handleChange}
                     />
+                    <p className="text-sm text-muted-foreground mt-1">
+                      A short description that will be displayed to customers
+                    </p>
                   </div>
                 </div>
+              </div>
 
-                <div className="space-y-4">
-                  <h3 className="text-lg font-medium text-blue-700">Location Information</h3>
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <FormField
-                      control={form.control}
-                      name="address"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Street Address</FormLabel>
-                          <FormControl>
-                            <div className="relative">
-                              <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                              <Input className="pl-9" placeholder="Enter street address" {...field} />
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
+              <Separator />
+
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium text-blue-700">Location Information</h3>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <Label htmlFor="address">Street Address</Label>
+                    <div className="relative mt-1">
+                      <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="address"
+                        name="address"
+                        className="pl-9"
+                        placeholder="Enter street address"
+                        value={formData.address}
+                        onChange={handleChange}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label htmlFor="city">City</Label>
+                    <Input
+                      id="city"
                       name="city"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>City</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Enter city" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                      placeholder="Enter city"
+                      className="mt-1"
+                      value={formData.city}
+                      onChange={handleChange}
                     />
-                    <FormField
-                      control={form.control}
-                      name="state"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>State</FormLabel>
-                          <FormControl>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select state" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem value="Andhra Pradesh">Andhra Pradesh</SelectItem>
-                                <SelectItem value="Delhi">Delhi</SelectItem>
-                                <SelectItem value="Gujarat">Gujarat</SelectItem>
-                                <SelectItem value="Karnataka">Karnataka</SelectItem>
-                                <SelectItem value="Maharashtra">Maharashtra</SelectItem>
-                                <SelectItem value="Tamil Nadu">Tamil Nadu</SelectItem>
-                                <SelectItem value="Telangana">Telangana</SelectItem>
-                                <SelectItem value="Uttar Pradesh">Uttar Pradesh</SelectItem>
-                                <SelectItem value="West Bengal">West Bengal</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
+                  </div>
+                  <div>
+                    <Label htmlFor="state">State</Label>
+                    <Select value={formData.state} onValueChange={(value) => handleSelectChange("state", value)}>
+                      <SelectTrigger className="mt-1">
+                        <SelectValue placeholder="Select state" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Andhra Pradesh">Andhra Pradesh</SelectItem>
+                        <SelectItem value="Delhi">Delhi</SelectItem>
+                        <SelectItem value="Gujarat">Gujarat</SelectItem>
+                        <SelectItem value="Karnataka">Karnataka</SelectItem>
+                        <SelectItem value="Maharashtra">Maharashtra</SelectItem>
+                        <SelectItem value="Tamil Nadu">Tamil Nadu</SelectItem>
+                        <SelectItem value="Telangana">Telangana</SelectItem>
+                        <SelectItem value="Uttar Pradesh">Uttar Pradesh</SelectItem>
+                        <SelectItem value="West Bengal">West Bengal</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="pinCode">PIN Code</Label>
+                    <Input
+                      id="pinCode"
                       name="pinCode"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>PIN Code</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Enter PIN code" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                      placeholder="Enter PIN code"
+                      className="mt-1"
+                      value={formData.pinCode}
+                      onChange={handleChange}
                     />
-                    <FormField
-                      control={form.control}
+                  </div>
+                  <div>
+                    <Label htmlFor="country">Country</Label>
+                    <Input
+                      id="country"
                       name="country"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Country</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Enter country" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                      placeholder="Enter country"
+                      className="mt-1"
+                      value={formData.country}
+                      onChange={handleChange}
                     />
-                    <FormField
-                      control={form.control}
+                  </div>
+                  <div>
+                    <Label htmlFor="serviceArea">Service Area</Label>
+                    <Input
+                      id="serviceArea"
                       name="serviceArea"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Service Area</FormLabel>
-                          <FormControl>
-                            <Input placeholder="e.g., 5 km radius, South Mumbai area" {...field} />
-                          </FormControl>
-                          <FormDescription>The area where this provider offers services</FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                      placeholder="e.g., 5 km radius, South Mumbai area"
+                      className="mt-1"
+                      value={formData.serviceArea}
+                      onChange={handleChange}
                     />
+                    <p className="text-sm text-muted-foreground mt-1">The area where this provider offers services</p>
                   </div>
                 </div>
+              </div>
 
-                <div className="space-y-4">
-                  <h3 className="text-lg font-medium text-orange-700">Service Information</h3>
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <FormField
-                      control={form.control}
+              <Separator />
+
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium text-orange-700">Service Information</h3>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <Label htmlFor="serviceTypes">Service Types</Label>
+                    <Input
+                      id="serviceTypes"
                       name="serviceTypes"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Service Types</FormLabel>
-                          <FormControl>
-                            <Input placeholder="e.g., Wash & Fold, Dry Cleaning, Ironing" {...field} />
-                          </FormControl>
-                          <FormDescription>Comma-separated list of services offered</FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                      placeholder="e.g., Wash & Fold, Dry Cleaning, Ironing"
+                      className="mt-1"
+                      value={formData.serviceTypes}
+                      onChange={handleChange}
                     />
-                    <FormField
-                      control={form.control}
-                      name="commissionRate"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Commission Rate (%)</FormLabel>
-                          <FormControl>
-                            <Input type="number" min="0" max="100" {...field} />
-                          </FormControl>
-                          <FormDescription>Platform commission percentage on each order</FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="status"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Status</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select status" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="Active">Active</SelectItem>
-                              <SelectItem value="Pending">Pending</SelectItem>
-                              <SelectItem value="Suspended">Suspended</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormDescription>Provider's status on the platform</FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="featured"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                          <div className="space-y-0.5">
-                            <FormLabel className="text-base">Featured Provider</FormLabel>
-                            <FormDescription>
-                              Feature this provider on the homepage and in search results
-                            </FormDescription>
-                          </div>
-                          <FormControl>
-                            <Switch checked={field.value} onCheckedChange={field.onChange} />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
+                    <p className="text-sm text-muted-foreground mt-1">Comma-separated list of services offered</p>
                   </div>
-                </div>
-
-                <div className="space-y-4">
-                  <h3 className="text-lg font-medium text-blue-700">Tax Information</h3>
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <FormField
-                      control={form.control}
-                      name="gstNumber"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>GST Number</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Enter GST number" {...field} />
-                          </FormControl>
-                          <FormDescription>Provider's GST registration number</FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                  <div>
+                    <Label htmlFor="commissionRate">Commission Rate (%)</Label>
+                    <Input
+                      id="commissionRate"
+                      name="commissionRate"
+                      type="number"
+                      min="0"
+                      max="100"
+                      className="mt-1"
+                      value={formData.commissionRate}
+                      onChange={handleChange}
                     />
-                    <FormField
-                      control={form.control}
-                      name="panNumber"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>PAN Number</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Enter PAN number" {...field} />
-                          </FormControl>
-                          <FormDescription>Provider's PAN card number</FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                    <p className="text-sm text-muted-foreground mt-1">Platform commission percentage on each order</p>
+                  </div>
+                  <div>
+                    <Label htmlFor="status">Status</Label>
+                    <Select value={formData.status} onValueChange={(value) => handleSelectChange("status", value)}>
+                      <SelectTrigger className="mt-1">
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Active">Active</SelectItem>
+                        <SelectItem value="Pending">Pending</SelectItem>
+                        <SelectItem value="Suspended">Suspended</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-sm text-muted-foreground mt-1">Provider's status on the platform</p>
+                  </div>
+                  <div className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <Label className="text-base">Featured Provider</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Feature this provider on the homepage and in search results
+                      </p>
+                    </div>
+                    <Switch
+                      checked={formData.featured}
+                      onCheckedChange={(checked) => handleSwitchChange("featured", checked)}
                     />
                   </div>
                 </div>
               </div>
 
-              <CardFooter className="flex justify-between px-0">
-                <Button variant="outline" type="button" onClick={() => router.push("/dashboard/admin/providers")}>
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={isSubmitting} className="bg-green-600 hover:bg-green-700">
-                  {isSubmitting ? (
-                    <>Processing...</>
-                  ) : (
-                    <>
-                      <Check className="mr-2 h-4 w-4" /> Add Provider
-                    </>
-                  )}
-                </Button>
-              </CardFooter>
-            </form>
-          </Form>
+              <Separator />
+
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium text-blue-700">Tax Information</h3>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <Label htmlFor="gstNumber">GST Number</Label>
+                    <Input
+                      id="gstNumber"
+                      name="gstNumber"
+                      placeholder="Enter GST number"
+                      className="mt-1"
+                      value={formData.gstNumber}
+                      onChange={handleChange}
+                    />
+                    <p className="text-sm text-muted-foreground mt-1">Provider's GST registration number</p>
+                  </div>
+                  <div>
+                    <Label htmlFor="panNumber">PAN Number</Label>
+                    <Input
+                      id="panNumber"
+                      name="panNumber"
+                      placeholder="Enter PAN number"
+                      className="mt-1"
+                      value={formData.panNumber}
+                      onChange={handleChange}
+                    />
+                    <p className="text-sm text-muted-foreground mt-1">Provider's PAN card number</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <CardFooter className="flex justify-between px-0">
+              <Button variant="outline" type="button" onClick={() => router.push("/dashboard/admin/providers")}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isSubmitting} className="bg-green-600 hover:bg-green-700">
+                {isSubmitting ? (
+                  <>Processing...</>
+                ) : (
+                  <>
+                    <Check className="mr-2 h-4 w-4" /> Add Provider
+                  </>
+                )}
+              </Button>
+            </CardFooter>
+          </form>
         </CardContent>
       </Card>
     </div>
   )
 }
-

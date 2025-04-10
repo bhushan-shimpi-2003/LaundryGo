@@ -1,312 +1,517 @@
 "use client"
 
 import { useState } from "react"
-import { Camera, Save, Shirt } from "lucide-react"
+import Image from "next/image"
+import { Clock, DollarSign, Edit, Plus, Trash } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
+import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/components/ui/use-toast"
 
-export default function ProviderProfilePage() {
+// Mock data for services
+const initialServices = [
+  {
+    id: "standard-wash",
+    name: "Standard Wash",
+    description: "Regular washing and drying service",
+    price: 9.99,
+    estimatedTime: "48 hours",
+    image: "/placeholder.svg?height=100&width=100",
+    active: true,
+    category: "wash",
+  },
+  {
+    id: "premium-wash",
+    name: "Premium Wash",
+    description: "Premium washing with fabric softener and special care",
+    price: 14.99,
+    estimatedTime: "48 hours",
+    image: "/placeholder.svg?height=100&width=100",
+    active: true,
+    category: "wash",
+  },
+  {
+    id: "dry-cleaning",
+    name: "Dry Cleaning",
+    description: "Professional dry cleaning for delicate items",
+    price: 19.99,
+    estimatedTime: "72 hours",
+    image: "/placeholder.svg?height=100&width=100",
+    active: true,
+    category: "dry-clean",
+  },
+  {
+    id: "ironing",
+    name: "Ironing Service",
+    description: "Professional ironing for your clothes",
+    price: 7.99,
+    estimatedTime: "24 hours",
+    image: "/placeholder.svg?height=100&width=100",
+    active: true,
+    category: "iron",
+  },
+  {
+    id: "wash-iron",
+    name: "Wash & Iron",
+    description: "Complete washing and ironing service",
+    price: 16.99,
+    estimatedTime: "72 hours",
+    image: "/placeholder.svg?height=100&width=100",
+    active: true,
+    category: "wash",
+  },
+]
+
+export default function ServicesPage() {
   const { toast } = useToast()
-  const [isLoading, setIsLoading] = useState(false)
-  const [businessHours, setBusinessHours] = useState({
-    monday: { open: "09:00", close: "18:00", closed: false },
-    tuesday: { open: "09:00", close: "18:00", closed: false },
-    wednesday: { open: "09:00", close: "18:00", closed: false },
-    thursday: { open: "09:00", close: "18:00", closed: false },
-    friday: { open: "09:00", close: "18:00", closed: false },
-    saturday: { open: "10:00", close: "16:00", closed: false },
-    sunday: { open: "10:00", close: "16:00", closed: true },
-  })
+  const [services, setServices] = useState(initialServices)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [currentService, setCurrentService] = useState<any>(null)
+  const [isNewService, setIsNewService] = useState(false)
 
-  const handleSaveProfile = () => {
-    setIsLoading(true)
-
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false)
-      toast({
-        title: "Profile updated",
-        description: "Your business profile has been updated successfully.",
-      })
-    }, 1500)
+  const handleAddService = () => {
+    setCurrentService({
+      id: "",
+      name: "",
+      description: "",
+      price: 0,
+      estimatedTime: "",
+      image: "/placeholder.svg?height=100&width=100",
+      active: true,
+      category: "wash",
+    })
+    setIsNewService(true)
+    setIsDialogOpen(true)
   }
 
-  const toggleDayClosed = (day: keyof typeof businessHours) => {
-    setBusinessHours({
-      ...businessHours,
-      [day]: {
-        ...businessHours[day],
-        closed: !businessHours[day].closed,
-      },
+  const handleEditService = (service: any) => {
+    setCurrentService(service)
+    setIsNewService(false)
+    setIsDialogOpen(true)
+  }
+
+  const handleToggleActive = (id: string) => {
+    setServices(services.map((service) => (service.id === id ? { ...service, active: !service.active } : service)))
+
+    const service = services.find((s) => s.id === id)
+    toast({
+      title: `Service ${service?.active ? "Deactivated" : "Activated"}`,
+      description: `${service?.name} has been ${service?.active ? "deactivated" : "activated"}.`,
     })
+  }
+
+  const handleDeleteService = (id: string) => {
+    const service = services.find((s) => s.id === id)
+    setServices(services.filter((service) => service.id !== id))
+
+    toast({
+      title: "Service Deleted",
+      description: `${service?.name} has been deleted.`,
+      variant: "destructive",
+    })
+  }
+
+  const handleSaveService = () => {
+    if (isNewService) {
+      // Generate a new ID based on the name
+      const newId = currentService.name.toLowerCase().replace(/\s+/g, "-")
+      const newService = { ...currentService, id: newId }
+      setServices([...services, newService])
+
+      toast({
+        title: "Service Added",
+        description: `${newService.name} has been added to your services.`,
+      })
+    } else {
+      setServices(services.map((service) => (service.id === currentService.id ? currentService : service)))
+
+      toast({
+        title: "Service Updated",
+        description: `${currentService.name} has been updated.`,
+      })
+    }
+
+    setIsDialogOpen(false)
   }
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold tracking-tight">Business Profile</h2>
-        <p className="text-muted-foreground">Manage your business information and service details</p>
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight">Services</h2>
+          <p className="text-muted-foreground">Manage the laundry services you offer to customers</p>
+        </div>
+        <Button onClick={handleAddService}>
+          <Plus className="mr-2 h-4 w-4" />
+          Add Service
+        </Button>
       </div>
 
-      <Tabs defaultValue="business" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 lg:w-[400px]">
-          <TabsTrigger value="business">Business Info</TabsTrigger>
-          <TabsTrigger value="hours">Business Hours</TabsTrigger>
-          <TabsTrigger value="team">Team</TabsTrigger>
+      <Tabs defaultValue="all" className="w-full">
+        <TabsList className="grid w-full grid-cols-4 lg:w-[400px]">
+          <TabsTrigger value="all">All</TabsTrigger>
+          <TabsTrigger value="wash">Wash</TabsTrigger>
+          <TabsTrigger value="dry-clean">Dry Clean</TabsTrigger>
+          <TabsTrigger value="iron">Iron</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="business" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Business Information</CardTitle>
-              <CardDescription>Update your business details and contact information</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex flex-col items-center justify-center space-y-3">
-                <div className="relative">
-                  <div className="h-24 w-24 rounded-full bg-muted flex items-center justify-center overflow-hidden border">
-                    <Shirt className="h-12 w-12 text-primary" />
+        <TabsContent value="all" className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {services.map((service) => (
+              <Card key={service.id} className={!service.active ? "opacity-70" : ""}>
+                <CardHeader className="pb-3">
+                  <div className="flex justify-between items-start">
+                    <div className="space-y-1">
+                      <CardTitle>{service.name}</CardTitle>
+                      <CardDescription>{service.description}</CardDescription>
+                    </div>
+                    <Image
+                      src={service.image || "/placeholder.svg"}
+                      alt={service.name}
+                      width={50}
+                      height={50}
+                      className="rounded-md"
+                    />
                   </div>
-                  <Button size="icon" variant="outline" className="absolute bottom-0 right-0 rounded-full h-8 w-8">
-                    <Camera className="h-4 w-4" />
-                    <span className="sr-only">Upload business logo</span>
-                  </Button>
-                </div>
-                <Button variant="outline" size="sm">
-                  Change Logo
-                </Button>
-              </div>
-
-              <Separator />
-
-              <div className="space-y-2">
-                <Label htmlFor="business-name">Business Name</Label>
-                <Input id="business-name" defaultValue="CleanCo Laundry" />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="business-email">Business Email</Label>
-                <Input id="business-email" type="email" defaultValue="info@cleanco.com" />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="business-phone">Business Phone</Label>
-                <Input id="business-phone" type="tel" defaultValue="+1 (555) 987-6543" />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="business-website">Website</Label>
-                <Input id="business-website" type="url" defaultValue="https://cleanco-laundry.com" />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="business-address">Business Address</Label>
-                <Input id="business-address" defaultValue="789 Laundry St" />
-              </div>
-
-              <div className="grid grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="business-city">City</Label>
-                  <Input id="business-city" defaultValue="New York" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="business-state">State</Label>
-                  <Input id="business-state" defaultValue="NY" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="business-zip">Zip Code</Label>
-                  <Input id="business-zip" defaultValue="10003" />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="business-description">Business Description</Label>
-                <Textarea
-                  id="business-description"
-                  placeholder="Tell customers about your business"
-                  className="min-h-[100px]"
-                  defaultValue="CleanCo Laundry is a premium laundry service provider with over 5 years of experience. We specialize in handling all types of fabrics with care and use eco-friendly detergents."
-                />
-              </div>
-            </CardContent>
-            <CardFooter className="flex justify-end">
-              <Button onClick={handleSaveProfile} disabled={isLoading}>
-                {isLoading ? (
-                  <>Saving...</>
-                ) : (
-                  <>
-                    <Save className="mr-2 h-4 w-4" />
-                    Save Changes
-                  </>
-                )}
-              </Button>
-            </CardFooter>
-          </Card>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center text-sm">
+                      <DollarSign className="mr-1 h-4 w-4 text-muted-foreground" />
+                      <span className="font-medium">${service.price.toFixed(2)}</span>
+                    </div>
+                    <div className="flex items-center text-sm">
+                      <Clock className="mr-1 h-4 w-4 text-muted-foreground" />
+                      <span>{service.estimatedTime}</span>
+                    </div>
+                  </div>
+                </CardContent>
+                <CardFooter className="flex justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      checked={service.active}
+                      onCheckedChange={() => handleToggleActive(service.id)}
+                      id={`active-${service.id}`}
+                    />
+                    <Label htmlFor={`active-${service.id}`}>{service.active ? "Active" : "Inactive"}</Label>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="icon" onClick={() => handleEditService(service)}>
+                      <Edit className="h-4 w-4" />
+                      <span className="sr-only">Edit</span>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="text-destructive"
+                      onClick={() => handleDeleteService(service.id)}
+                    >
+                      <Trash className="h-4 w-4" />
+                      <span className="sr-only">Delete</span>
+                    </Button>
+                  </div>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
         </TabsContent>
 
-        <TabsContent value="hours" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Business Hours</CardTitle>
-              <CardDescription>Set your operating hours for each day of the week</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {Object.entries(businessHours).map(([day, hours]) => (
-                <div key={day} className="grid grid-cols-[1fr_2fr_2fr_1fr] gap-4 items-center">
-                  <div className="font-medium capitalize">{day}</div>
-                  <div className="flex items-center gap-2">
-                    <Label htmlFor={`${day}-open`} className="w-12">
-                      Open
-                    </Label>
-                    <Input
-                      id={`${day}-open`}
-                      type="time"
-                      value={hours.open}
-                      onChange={(e) =>
-                        setBusinessHours({
-                          ...businessHours,
-                          [day]: { ...hours, open: e.target.value },
-                        })
-                      }
-                      disabled={hours.closed}
-                    />
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Label htmlFor={`${day}-close`} className="w-12">
-                      Close
-                    </Label>
-                    <Input
-                      id={`${day}-close`}
-                      type="time"
-                      value={hours.close}
-                      onChange={(e) =>
-                        setBusinessHours({
-                          ...businessHours,
-                          [day]: { ...hours, close: e.target.value },
-                        })
-                      }
-                      disabled={hours.closed}
-                    />
-                  </div>
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id={`${day}-closed`}
-                      checked={hours.closed}
-                      onChange={() => toggleDayClosed(day as keyof typeof businessHours)}
-                      className="mr-2 h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-                    />
-                    <Label htmlFor={`${day}-closed`} className="text-sm">
-                      Closed
-                    </Label>
-                  </div>
-                </div>
+        <TabsContent value="wash" className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {services
+              .filter((service) => service.category === "wash")
+              .map((service) => (
+                <Card key={service.id} className={!service.active ? "opacity-70" : ""}>
+                  <CardHeader className="pb-3">
+                    <div className="flex justify-between items-start">
+                      <div className="space-y-1">
+                        <CardTitle>{service.name}</CardTitle>
+                        <CardDescription>{service.description}</CardDescription>
+                      </div>
+                      <Image
+                        src={service.image || "/placeholder.svg"}
+                        alt={service.name}
+                        width={50}
+                        height={50}
+                        className="rounded-md"
+                      />
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center text-sm">
+                        <DollarSign className="mr-1 h-4 w-4 text-muted-foreground" />
+                        <span className="font-medium">${service.price.toFixed(2)}</span>
+                      </div>
+                      <div className="flex items-center text-sm">
+                        <Clock className="mr-1 h-4 w-4 text-muted-foreground" />
+                        <span>{service.estimatedTime}</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                  <CardFooter className="flex justify-between">
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        checked={service.active}
+                        onCheckedChange={() => handleToggleActive(service.id)}
+                        id={`active-${service.id}`}
+                      />
+                      <Label htmlFor={`active-${service.id}`}>{service.active ? "Active" : "Inactive"}</Label>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="icon" onClick={() => handleEditService(service)}>
+                        <Edit className="h-4 w-4" />
+                        <span className="sr-only">Edit</span>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="text-destructive"
+                        onClick={() => handleDeleteService(service.id)}
+                      >
+                        <Trash className="h-4 w-4" />
+                        <span className="sr-only">Delete</span>
+                      </Button>
+                    </div>
+                  </CardFooter>
+                </Card>
               ))}
-            </CardContent>
-            <CardFooter className="flex justify-end">
-              <Button onClick={handleSaveProfile} disabled={isLoading}>
-                {isLoading ? (
-                  <>Saving...</>
-                ) : (
-                  <>
-                    <Save className="mr-2 h-4 w-4" />
-                    Save Hours
-                  </>
-                )}
-              </Button>
-            </CardFooter>
-          </Card>
+          </div>
         </TabsContent>
 
-        <TabsContent value="team" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Team Members</CardTitle>
-                  <CardDescription>Manage your team members and their roles</CardDescription>
-                </div>
-                <Button size="sm">Add Team Member</Button>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="rounded-lg border p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                      <span className="font-medium text-primary">JD</span>
+        <TabsContent value="dry-clean" className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {services
+              .filter((service) => service.category === "dry-clean")
+              .map((service) => (
+                <Card key={service.id} className={!service.active ? "opacity-70" : ""}>
+                  <CardHeader className="pb-3">
+                    <div className="flex justify-between items-start">
+                      <div className="space-y-1">
+                        <CardTitle>{service.name}</CardTitle>
+                        <CardDescription>{service.description}</CardDescription>
+                      </div>
+                      <Image
+                        src={service.image || "/placeholder.svg"}
+                        alt={service.name}
+                        width={50}
+                        height={50}
+                        className="rounded-md"
+                      />
                     </div>
-                    <div>
-                      <div className="font-medium">John Doe</div>
-                      <div className="text-sm text-muted-foreground">Manager</div>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center text-sm">
+                        <DollarSign className="mr-1 h-4 w-4 text-muted-foreground" />
+                        <span className="font-medium">${service.price.toFixed(2)}</span>
+                      </div>
+                      <div className="flex items-center text-sm">
+                        <Clock className="mr-1 h-4 w-4 text-muted-foreground" />
+                        <span>{service.estimatedTime}</span>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm">
-                      Edit
-                    </Button>
-                    <Button variant="outline" size="sm" className="text-destructive">
-                      Remove
-                    </Button>
-                  </div>
-                </div>
-              </div>
+                  </CardContent>
+                  <CardFooter className="flex justify-between">
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        checked={service.active}
+                        onCheckedChange={() => handleToggleActive(service.id)}
+                        id={`active-${service.id}`}
+                      />
+                      <Label htmlFor={`active-${service.id}`}>{service.active ? "Active" : "Inactive"}</Label>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="icon" onClick={() => handleEditService(service)}>
+                        <Edit className="h-4 w-4" />
+                        <span className="sr-only">Edit</span>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="text-destructive"
+                        onClick={() => handleDeleteService(service.id)}
+                      >
+                        <Trash className="h-4 w-4" />
+                        <span className="sr-only">Delete</span>
+                      </Button>
+                    </div>
+                  </CardFooter>
+                </Card>
+              ))}
+          </div>
+        </TabsContent>
 
-              <div className="rounded-lg border p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                      <span className="font-medium text-primary">JS</span>
+        <TabsContent value="iron" className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {services
+              .filter((service) => service.category === "iron")
+              .map((service) => (
+                <Card key={service.id} className={!service.active ? "opacity-70" : ""}>
+                  <CardHeader className="pb-3">
+                    <div className="flex justify-between items-start">
+                      <div className="space-y-1">
+                        <CardTitle>{service.name}</CardTitle>
+                        <CardDescription>{service.description}</CardDescription>
+                      </div>
+                      <Image
+                        src={service.image || "/placeholder.svg"}
+                        alt={service.name}
+                        width={50}
+                        height={50}
+                        className="rounded-md"
+                      />
                     </div>
-                    <div>
-                      <div className="font-medium">Jane Smith</div>
-                      <div className="text-sm text-muted-foreground">Laundry Specialist</div>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center text-sm">
+                        <DollarSign className="mr-1 h-4 w-4 text-muted-foreground" />
+                        <span className="font-medium">${service.price.toFixed(2)}</span>
+                      </div>
+                      <div className="flex items-center text-sm">
+                        <Clock className="mr-1 h-4 w-4 text-muted-foreground" />
+                        <span>{service.estimatedTime}</span>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm">
-                      Edit
-                    </Button>
-                    <Button variant="outline" size="sm" className="text-destructive">
-                      Remove
-                    </Button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="rounded-lg border p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                      <span className="font-medium text-primary">RJ</span>
+                  </CardContent>
+                  <CardFooter className="flex justify-between">
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        checked={service.active}
+                        onCheckedChange={() => handleToggleActive(service.id)}
+                        id={`active-${service.id}`}
+                      />
+                      <Label htmlFor={`active-${service.id}`}>{service.active ? "Active" : "Inactive"}</Label>
                     </div>
-                    <div>
-                      <div className="font-medium">Robert Johnson</div>
-                      <div className="text-sm text-muted-foreground">Delivery Driver</div>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="icon" onClick={() => handleEditService(service)}>
+                        <Edit className="h-4 w-4" />
+                        <span className="sr-only">Edit</span>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="text-destructive"
+                        onClick={() => handleDeleteService(service.id)}
+                      >
+                        <Trash className="h-4 w-4" />
+                        <span className="sr-only">Delete</span>
+                      </Button>
                     </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm">
-                      Edit
-                    </Button>
-                    <Button variant="outline" size="sm" className="text-destructive">
-                      Remove
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+                  </CardFooter>
+                </Card>
+              ))}
+          </div>
         </TabsContent>
       </Tabs>
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>{isNewService ? "Add New Service" : "Edit Service"}</DialogTitle>
+            <DialogDescription>
+              {isNewService ? "Add a new service to your offerings." : "Make changes to your existing service."}
+            </DialogDescription>
+          </DialogHeader>
+          {currentService && (
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="service-name" className="text-right">
+                  Name
+                </Label>
+                <Input
+                  id="service-name"
+                  value={currentService.name}
+                  onChange={(e) => setCurrentService({ ...currentService, name: e.target.value })}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="service-price" className="text-right">
+                  Price ($)
+                </Label>
+                <Input
+                  id="service-price"
+                  type="number"
+                  step="0.01"
+                  value={currentService.price}
+                  onChange={(e) => setCurrentService({ ...currentService, price: Number.parseFloat(e.target.value) })}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="service-time" className="text-right">
+                  Est. Time
+                </Label>
+                <Input
+                  id="service-time"
+                  value={currentService.estimatedTime}
+                  onChange={(e) => setCurrentService({ ...currentService, estimatedTime: e.target.value })}
+                  className="col-span-3"
+                  placeholder="e.g., 24 hours"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="service-category" className="text-right">
+                  Category
+                </Label>
+                <select
+                  id="service-category"
+                  value={currentService.category}
+                  onChange={(e) => setCurrentService({ ...currentService, category: e.target.value })}
+                  className="col-span-3 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <option value="wash">Wash</option>
+                  <option value="dry-clean">Dry Clean</option>
+                  <option value="iron">Iron</option>
+                </select>
+              </div>
+              <div className="grid grid-cols-4 items-start gap-4">
+                <Label htmlFor="service-description" className="text-right">
+                  Description
+                </Label>
+                <Textarea
+                  id="service-description"
+                  value={currentService.description}
+                  onChange={(e) => setCurrentService({ ...currentService, description: e.target.value })}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label className="text-right">Active</Label>
+                <div className="flex items-center space-x-2 col-span-3">
+                  <Switch
+                    checked={currentService.active}
+                    onCheckedChange={(checked) => setCurrentService({ ...currentService, active: checked })}
+                    id="service-active"
+                  />
+                  <Label htmlFor="service-active">{currentService.active ? "Active" : "Inactive"}</Label>
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSaveService}>{isNewService ? "Add Service" : "Save Changes"}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
-

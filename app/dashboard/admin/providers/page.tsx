@@ -31,7 +31,7 @@ const initialProviders = [
     status: "Active",
     orders: 245,
     rating: 4.8,
-    revenue: "₹12,450.75",
+    revenue: "$12,450.75",
   },
   {
     id: "SP002",
@@ -43,7 +43,7 @@ const initialProviders = [
     status: "Active",
     orders: 187,
     rating: 4.6,
-    revenue: "₹9,875.50",
+    revenue: "$9,875.50",
   },
   {
     id: "SP003",
@@ -55,7 +55,7 @@ const initialProviders = [
     status: "Pending",
     orders: 0,
     rating: 0,
-    revenue: "₹0.00",
+    revenue: "$0.00",
   },
   {
     id: "SP004",
@@ -67,7 +67,7 @@ const initialProviders = [
     status: "Active",
     orders: 156,
     rating: 4.5,
-    revenue: "₹7,890.25",
+    revenue: "$7,890.25",
   },
   {
     id: "SP005",
@@ -79,7 +79,7 @@ const initialProviders = [
     status: "Suspended",
     orders: 98,
     rating: 3.2,
-    revenue: "₹4,567.80",
+    revenue: "$4,567.80",
   },
   {
     id: "SP006",
@@ -91,7 +91,7 @@ const initialProviders = [
     status: "Active",
     orders: 67,
     rating: 4.7,
-    revenue: "₹3,450.60",
+    revenue: "$3,450.60",
   },
   {
     id: "SP007",
@@ -103,7 +103,7 @@ const initialProviders = [
     status: "Active",
     orders: 42,
     rating: 4.4,
-    revenue: "₹2,156.30",
+    revenue: "$2,156.30",
   },
   {
     id: "SP008",
@@ -115,7 +115,7 @@ const initialProviders = [
     status: "Pending",
     orders: 0,
     rating: 0,
-    revenue: "₹0.00",
+    revenue: "$0.00",
   },
 ]
 
@@ -360,4 +360,3 @@ export default function ProvidersPage() {
     </div>
   )
 }
-

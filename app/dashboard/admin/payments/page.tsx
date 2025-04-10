@@ -18,6 +18,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { useToast } from "@/components/ui/use-toast"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Badge } from "@/components/ui/badge"
 
 // Mock data for payments
 const initialPayments = [
@@ -192,6 +193,23 @@ export default function PaymentsPage() {
     }
   }
 
+  // Get status badge variant
+  const getStatusVariant = (status: string) => {
+    switch (status) {
+      case "Completed":
+        return "success"
+      case "Pending":
+      case "Processing":
+        return "warning"
+      case "Failed":
+        return "danger"
+      case "Refunded":
+        return "info"
+      default:
+        return "default"
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -297,18 +315,7 @@ export default function PaymentsPage() {
                         <TableCell>{new Date(payment.date).toLocaleDateString()}</TableCell>
                         <TableCell>{payment.method}</TableCell>
                         <TableCell>
-                          <div className="flex items-center">
-                            <span
-                              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
-                              ${payment.status === "Completed" ? "bg-green-100 text-green-800" : ""}
-                              ${payment.status === "Pending" ? "bg-yellow-100 text-yellow-800" : ""}
-                              ${payment.status === "Failed" ? "bg-red-100 text-red-800" : ""}
-                              ${payment.status === "Refunded" ? "bg-blue-100 text-blue-800" : ""}
-                            `}
-                            >
-                              {payment.status}
-                            </span>
-                          </div>
+                          <Badge variant={getStatusVariant(payment.status)}>{payment.status}</Badge>
                         </TableCell>
                         <TableCell className="text-right">
                           <DropdownMenu>
@@ -433,17 +440,7 @@ export default function PaymentsPage() {
                         <TableCell>{payout.accountNumber}</TableCell>
                         <TableCell>{payout.orders}</TableCell>
                         <TableCell>
-                          <div className="flex items-center">
-                            <span
-                              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
-                              ${payout.status === "Completed" ? "bg-green-100 text-green-800" : ""}
-                              ${payout.status === "Processing" ? "bg-yellow-100 text-yellow-800" : ""}
-                              ${payout.status === "Failed" ? "bg-red-100 text-red-800" : ""}
-                            `}
-                            >
-                              {payout.status}
-                            </span>
-                          </div>
+                          <Badge variant={getStatusVariant(payout.status)}>{payout.status}</Badge>
                         </TableCell>
                         <TableCell className="text-right">
                           <DropdownMenu>
@@ -489,4 +486,3 @@ export default function PaymentsPage() {
     </div>
   )
 }
-

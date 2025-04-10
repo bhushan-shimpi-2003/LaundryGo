@@ -298,4 +298,3 @@ export default function PromotionsPage() {
     </div>
   )
 }
-

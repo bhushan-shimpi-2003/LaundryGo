@@ -30,7 +30,7 @@ const initialCustomers = [
     joinDate: "2023-01-15",
     status: "Active",
     orders: 12,
-    totalSpent: "₹345.88",
+    totalSpent: "$345.88",
   },
   {
     id: "C002",
@@ -41,7 +41,7 @@ const initialCustomers = [
     joinDate: "2023-02-03",
     status: "Active",
     orders: 8,
-    totalSpent: "₹210.45",
+    totalSpent: "$210.45",
   },
   {
     id: "C003",
@@ -52,7 +52,7 @@ const initialCustomers = [
     joinDate: "2023-02-18",
     status: "Active",
     orders: 5,
-    totalSpent: "₹145.99",
+    totalSpent: "$145.99",
   },
   {
     id: "C004",
@@ -63,7 +63,7 @@ const initialCustomers = [
     joinDate: "2023-03-05",
     status: "Inactive",
     orders: 3,
-    totalSpent: "₹89.97",
+    totalSpent: "$89.97",
   },
   {
     id: "C005",
@@ -74,7 +74,7 @@ const initialCustomers = [
     joinDate: "2023-03-12",
     status: "Active",
     orders: 7,
-    totalSpent: "₹178.50",
+    totalSpent: "$178.50",
   },
   {
     id: "C006",
@@ -85,7 +85,7 @@ const initialCustomers = [
     joinDate: "2023-03-20",
     status: "Active",
     orders: 4,
-    totalSpent: "₹112.75",
+    totalSpent: "$112.75",
   },
   {
     id: "C007",
@@ -96,7 +96,7 @@ const initialCustomers = [
     joinDate: "2023-04-02",
     status: "Active",
     orders: 6,
-    totalSpent: "₹156.30",
+    totalSpent: "$156.30",
   },
   {
     id: "C008",
@@ -107,7 +107,7 @@ const initialCustomers = [
     joinDate: "2023-04-15",
     status: "Suspended",
     orders: 2,
-    totalSpent: "₹65.99",
+    totalSpent: "$65.99",
   },
 ]
 
@@ -323,4 +323,3 @@ export default function CustomersPage() {
     </div>
   )
 }
-

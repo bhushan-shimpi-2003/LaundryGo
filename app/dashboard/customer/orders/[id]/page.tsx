@@ -541,4 +541,3 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
     </div>
   )
 }
-

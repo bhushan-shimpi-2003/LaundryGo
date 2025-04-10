@@ -95,7 +95,10 @@ export default function AdminSettingsPage() {
                   id="platform-currency"
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  <option value="eur">Rupee (Rs)</option>
+                  <option value="usd">USD ($)</option>
+                  <option value="eur">EUR (€)</option>
+                  <option value="gbp">GBP (£)</option>
+                  <option value="cad">CAD ($)</option>
                 </select>
               </div>
 
@@ -431,4 +434,3 @@ export default function AdminSettingsPage() {
     </div>
   )
 }
-

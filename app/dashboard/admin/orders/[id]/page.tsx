@@ -520,4 +520,3 @@ export default function AdminOrderDetailsPage({ params }: { params: { id: string
     </div>
   )
 }
-

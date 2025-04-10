@@ -24,35 +24,35 @@ const serviceTypes = [
     id: "standard-wash",
     name: "Standard Wash",
     description: "Regular washing and drying service",
-    price: 9.99,
+    price: 799,
     estimatedTime: "48 hours",
   },
   {
     id: "premium-wash",
     name: "Premium Wash",
     description: "Premium washing with fabric softener and special care",
-    price: 14.99,
+    price: 1199,
     estimatedTime: "48 hours",
   },
   {
     id: "dry-cleaning",
     name: "Dry Cleaning",
     description: "Professional dry cleaning for delicate items",
-    price: 19.99,
+    price: 1599,
     estimatedTime: "72 hours",
   },
   {
     id: "ironing",
     name: "Ironing Service",
     description: "Professional ironing for your clothes",
-    price: 7.99,
+    price: 599,
     estimatedTime: "24 hours",
   },
   {
     id: "wash-iron",
     name: "Wash & Iron",
     description: "Complete washing and ironing service",
-    price: 16.99,
+    price: 1299,
     estimatedTime: "72 hours",
   },
 ]
@@ -72,13 +72,13 @@ const savedAddresses = [
   {
     id: "home",
     name: "Home",
-    address: "123 Main St, Apt 4B, New York, NY 10001",
+    address: "123 Main St, Apt 4B, Mumbai, MH 400001",
     isDefault: true,
   },
   {
     id: "work",
     name: "Work",
-    address: "456 Business Ave, Suite 200, New York, NY 10002",
+    address: "456 Business Ave, Suite 200, Mumbai, MH 400002",
     isDefault: false,
   },
 ]
@@ -92,6 +92,7 @@ export default function NewOrderPage() {
   const [selectedAddress, setSelectedAddress] = useState<string>("home")
   const [useNewAddress, setUseNewAddress] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [paymentMethod, setPaymentMethod] = useState<string>("cash")
 
   const handleNext = () => {
     setStep(step + 1)
@@ -156,23 +157,23 @@ export default function NewOrderPage() {
       </div>
 
       {step === 1 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Select Service</CardTitle>
+        <Card className="border-orange-200 shadow-lg hover:shadow-xl transition-all duration-300">
+          <CardHeader className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-t-lg">
+            <CardTitle className="text-orange-800">Select Service</CardTitle>
             <CardDescription>Choose the type of laundry service you need</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-4 p-6">
             <RadioGroup value={selectedService} onValueChange={setSelectedService}>
               {serviceTypes.map((service) => (
                 <div key={service.id} className="flex">
-                  <FormItem className="flex items-start space-x-3 space-y-0 rounded-md border p-4 w-full">
+                  <FormItem className="flex items-start space-x-3 space-y-0 rounded-md border p-4 w-full hover:border-orange-300 hover:bg-orange-50 transition-all duration-200">
                     <FormControl>
                       <RadioGroupItem value={service.id} />
                     </FormControl>
                     <div className="flex-1 space-y-1">
                       <div className="flex items-center justify-between">
                         <FormLabel className="text-base font-medium">{service.name}</FormLabel>
-                        <span className="text-base font-medium">${service.price.toFixed(2)}</span>
+                        <span className="text-base font-medium">₹{service.price.toFixed(2)}</span>
                       </div>
                       <FormDescription className="text-sm text-muted-foreground">{service.description}</FormDescription>
                       <div className="flex items-center text-xs text-muted-foreground mt-2">
@@ -187,14 +188,23 @@ export default function NewOrderPage() {
 
             <div className="space-y-2">
               <FormLabel>Special Instructions (Optional)</FormLabel>
-              <Textarea placeholder="Any special instructions for handling your laundry..." className="min-h-[100px]" />
+              <Textarea
+                placeholder="Any special instructions for handling your laundry..."
+                className="min-h-[100px] focus:border-orange-300 focus:ring-orange-200"
+              />
             </div>
           </CardContent>
-          <CardFooter className="flex justify-between">
+          <CardFooter className="flex justify-between p-6 bg-gradient-to-r from-orange-50 to-orange-100 rounded-b-lg">
             <Link href="/dashboard/customer/orders">
-              <Button variant="outline">Cancel</Button>
+              <Button variant="outline" className="border-orange-300 text-orange-700 hover:bg-orange-100">
+                Cancel
+              </Button>
             </Link>
-            <Button onClick={handleNext} disabled={!selectedService}>
+            <Button
+              onClick={handleNext}
+              disabled={!selectedService}
+              className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 transition-all duration-300"
+            >
               Next
             </Button>
           </CardFooter>
@@ -202,21 +212,24 @@ export default function NewOrderPage() {
       )}
 
       {step === 2 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Schedule Pickup</CardTitle>
+        <Card className="border-green-200 shadow-lg hover:shadow-xl transition-all duration-300">
+          <CardHeader className="bg-gradient-to-r from-green-50 to-green-100 rounded-t-lg">
+            <CardTitle className="text-green-800">Schedule Pickup</CardTitle>
             <CardDescription>Choose when you want your laundry to be picked up</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-4 p-6">
             <div className="space-y-2">
               <FormLabel>Pickup Date</FormLabel>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
-                    className={cn("w-full justify-start text-left font-normal", !date && "text-muted-foreground")}
+                    className={cn(
+                      "w-full justify-start text-left font-normal border-green-200 hover:border-green-300 hover:bg-green-50",
+                      !date && "text-muted-foreground",
+                    )}
                   >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    <CalendarIcon className="mr-2 h-4 w-4 text-green-600" />
                     {date ? date.toLocaleDateString() : "Select date"}
                   </Button>
                 </PopoverTrigger>
@@ -232,6 +245,7 @@ export default function NewOrderPage() {
                       today.setHours(0, 0, 0, 0)
                       return date < today
                     }}
+                    className="rounded-md border-green-200"
                   />
                 </PopoverContent>
               </Popover>
@@ -240,12 +254,12 @@ export default function NewOrderPage() {
             <div className="space-y-2">
               <FormLabel>Pickup Time</FormLabel>
               <Select value={selectedTimeSlot} onValueChange={setSelectedTimeSlot}>
-                <SelectTrigger>
+                <SelectTrigger className="border-green-200 focus:ring-green-200 hover:border-green-300">
                   <SelectValue placeholder="Select time slot" />
                 </SelectTrigger>
                 <SelectContent>
                   {timeSlots.map((slot) => (
-                    <SelectItem key={slot} value={slot}>
+                    <SelectItem key={slot} value={slot} className="hover:bg-green-50">
                       {slot}
                     </SelectItem>
                   ))}
@@ -253,11 +267,19 @@ export default function NewOrderPage() {
               </Select>
             </div>
           </CardContent>
-          <CardFooter className="flex justify-between">
-            <Button variant="outline" onClick={handleBack}>
+          <CardFooter className="flex justify-between p-6 bg-gradient-to-r from-green-50 to-green-100 rounded-b-lg">
+            <Button
+              variant="outline"
+              onClick={handleBack}
+              className="border-green-300 text-green-700 hover:bg-green-100"
+            >
               Back
             </Button>
-            <Button onClick={handleNext} disabled={!date || !selectedTimeSlot}>
+            <Button
+              onClick={handleNext}
+              disabled={!date || !selectedTimeSlot}
+              className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 transition-all duration-300"
+            >
               Next
             </Button>
           </CardFooter>
@@ -265,12 +287,12 @@ export default function NewOrderPage() {
       )}
 
       {step === 3 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Pickup Address</CardTitle>
-            <CardDescription>Where should we pick up your laundry?</CardDescription>
+        <Card className="border-blue-200 shadow-lg hover:shadow-xl transition-all duration-300">
+          <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-t-lg">
+            <CardTitle className="text-blue-800">Pickup Address & Payment</CardTitle>
+            <CardDescription>Where should we pick up your laundry and how would you like to pay?</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-4 p-6">
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
                 <Checkbox
@@ -283,6 +305,7 @@ export default function NewOrderPage() {
                       setUseNewAddress(false)
                     }
                   }}
+                  className="border-blue-300 text-blue-600 focus:ring-blue-200"
                 />
                 <label
                   htmlFor="use-new-address"
@@ -296,15 +319,15 @@ export default function NewOrderPage() {
                 <RadioGroup value={selectedAddress} onValueChange={setSelectedAddress}>
                   {savedAddresses.map((address) => (
                     <div key={address.id} className="flex">
-                      <FormItem className="flex items-start space-x-3 space-y-0 rounded-md border p-4 w-full">
+                      <FormItem className="flex items-start space-x-3 space-y-0 rounded-md border p-4 w-full hover:border-blue-300 hover:bg-blue-50 transition-all duration-200">
                         <FormControl>
-                          <RadioGroupItem value={address.id} />
+                          <RadioGroupItem value={address.id} className="border-blue-300 text-blue-600" />
                         </FormControl>
                         <div className="flex-1 space-y-1">
                           <div className="flex items-center">
                             <FormLabel className="text-base font-medium">{address.name}</FormLabel>
                             {address.isDefault && (
-                              <span className="ml-2 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                              <span className="ml-2 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-600">
                                 Default
                               </span>
                             )}
@@ -316,43 +339,63 @@ export default function NewOrderPage() {
                   ))}
                 </RadioGroup>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-4 p-4 border rounded-md border-blue-200 bg-blue-50">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <FormLabel>Address Name</FormLabel>
-                      <Input placeholder="e.g., Home, Work, etc." />
+                      <Input
+                        placeholder="e.g., Home, Work, etc."
+                        className="border-blue-200 focus:border-blue-300 focus:ring-blue-200"
+                      />
                     </div>
                     <div className="space-y-2">
                       <FormLabel>Phone Number</FormLabel>
-                      <Input type="tel" placeholder="Your contact number" />
+                      <Input
+                        type="tel"
+                        placeholder="Your contact number"
+                        className="border-blue-200 focus:border-blue-300 focus:ring-blue-200"
+                      />
                     </div>
                   </div>
                   <div className="space-y-2">
                     <FormLabel>Street Address</FormLabel>
-                    <Input placeholder="Street address" />
+                    <Input
+                      placeholder="Street address"
+                      className="border-blue-200 focus:border-blue-300 focus:ring-blue-200"
+                    />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <FormLabel>City</FormLabel>
-                      <Input placeholder="City" />
+                      <Input placeholder="City" className="border-blue-200 focus:border-blue-300 focus:ring-blue-200" />
                     </div>
                     <div className="space-y-2">
                       <FormLabel>State</FormLabel>
-                      <Input placeholder="State" />
+                      <Input
+                        placeholder="State"
+                        className="border-blue-200 focus:border-blue-300 focus:ring-blue-200"
+                      />
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <FormLabel>Zip Code</FormLabel>
-                      <Input placeholder="Zip code" />
+                      <Input
+                        placeholder="Zip code"
+                        className="border-blue-200 focus:border-blue-300 focus:ring-blue-200"
+                      />
                     </div>
                     <div className="space-y-2">
                       <FormLabel>Country</FormLabel>
-                      <Input placeholder="Country" defaultValue="United States" />
+                      <Input
+                        placeholder="Country"
+                        defaultValue="India"
+                        className="border-blue-200 focus:border-blue-300 focus:ring-blue-200"
+                      />
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Checkbox id="save-address" />
+                    <Checkbox id="save-address" className="border-blue-300 text-blue-600 focus:ring-blue-200" />
                     <label
                       htmlFor="save-address"
                       className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -366,9 +409,39 @@ export default function NewOrderPage() {
 
             <Separator className="my-4" />
 
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium text-blue-800">Payment Method</h3>
+              <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod} className="space-y-3">
+                <FormItem className="flex items-start space-x-3 space-y-0 rounded-md border p-4 hover:border-blue-300 hover:bg-blue-50 transition-all duration-200">
+                  <FormControl>
+                    <RadioGroupItem value="cash" className="border-blue-300 text-blue-600" />
+                  </FormControl>
+                  <div className="flex-1 space-y-1">
+                    <FormLabel className="text-base font-medium">Cash on Delivery</FormLabel>
+                    <FormDescription className="text-sm text-muted-foreground">
+                      Pay with cash when your laundry is picked up
+                    </FormDescription>
+                  </div>
+                </FormItem>
+                <FormItem className="flex items-start space-x-3 space-y-0 rounded-md border p-4 hover:border-blue-300 hover:bg-blue-50 transition-all duration-200">
+                  <FormControl>
+                    <RadioGroupItem value="online" className="border-blue-300 text-blue-600" />
+                  </FormControl>
+                  <div className="flex-1 space-y-1">
+                    <FormLabel className="text-base font-medium">Online Payment</FormLabel>
+                    <FormDescription className="text-sm text-muted-foreground">
+                      Pay now using UPI, credit/debit card, or net banking
+                    </FormDescription>
+                  </div>
+                </FormItem>
+              </RadioGroup>
+            </div>
+
+            <Separator className="my-4" />
+
             <div className="space-y-2">
-              <h3 className="text-lg font-medium">Order Summary</h3>
-              <div className="rounded-md border p-4 space-y-4">
+              <h3 className="text-lg font-medium text-blue-800">Order Summary</h3>
+              <div className="rounded-md border p-4 space-y-4 bg-gradient-to-r from-blue-50 to-blue-100">
                 <div className="flex justify-between">
                   <span className="font-medium">Service:</span>
                   <span>{serviceTypes.find((s) => s.id === selectedService)?.name || "Not selected"}</span>
@@ -381,20 +454,50 @@ export default function NewOrderPage() {
                   <span className="font-medium">Pickup Time:</span>
                   <span>{selectedTimeSlot || "Not selected"}</span>
                 </div>
-                <Separator />
+                <Separator className="bg-blue-200" />
                 <div className="flex justify-between text-lg font-medium">
                   <span>Total:</span>
-                  <span>${serviceTypes.find((s) => s.id === selectedService)?.price.toFixed(2) || "0.00"}</span>
+                  <span>₹{serviceTypes.find((s) => s.id === selectedService)?.price.toFixed(2) || "0.00"}</span>
                 </div>
               </div>
             </div>
           </CardContent>
-          <CardFooter className="flex justify-between">
-            <Button variant="outline" onClick={handleBack}>
+          <CardFooter className="flex justify-between p-6 bg-gradient-to-r from-blue-50 to-blue-100 rounded-b-lg">
+            <Button variant="outline" onClick={handleBack} className="border-blue-300 text-blue-700 hover:bg-blue-100">
               Back
             </Button>
-            <Button onClick={handleSubmit} disabled={isLoading}>
-              {isLoading ? "Processing..." : "Schedule Pickup"}
+            <Button
+              onClick={handleSubmit}
+              disabled={isLoading}
+              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-300"
+            >
+              {isLoading ? (
+                <span className="flex items-center">
+                  <svg
+                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Processing...
+                </span>
+              ) : (
+                "Schedule Pickup"
+              )}
             </Button>
           </CardFooter>
         </Card>
